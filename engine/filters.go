@@ -1,7 +1,7 @@
 package engine
 
 import (
-	"github.com/jcwillox/system-bridge/config"
+	"github.com/jcwillox/system-bridge/utils"
 	"time"
 )
 
@@ -9,8 +9,8 @@ type Filters struct {
 	Or  []Filters `yaml:"or"`
 	And []Filters `yaml:"and"`
 
-	Throttle config.Duration `yaml:"throttle"`
-	Delta    float64         `yaml:"delta"`
+	Throttle utils.Duration `yaml:"throttle"`
+	Delta    float64        `yaml:"delta"`
 
 	state *FilterState
 }

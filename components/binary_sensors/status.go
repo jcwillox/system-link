@@ -1,6 +1,8 @@
 package binary_sensors
 
-import "github.com/jcwillox/system-bridge/components"
+import (
+	"github.com/jcwillox/system-bridge/components"
+)
 
 type StatusConfig = components.EntityConfig
 

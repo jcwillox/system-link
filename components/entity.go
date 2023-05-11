@@ -4,31 +4,14 @@ import (
 	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/jcwillox/system-bridge/config"
+	"github.com/jcwillox/system-bridge/utils"
 	"github.com/rs/zerolog/log"
-	"gopkg.in/yaml.v3"
 	"path"
-	"time"
 )
-
-type Duration time.Duration
-
-func (d *Duration) UnmarshalYAML(n *yaml.Node) error {
-	var s string
-	err := n.Decode(&s)
-	if err != nil {
-		return err
-	}
-	duration, err := time.ParseDuration(s)
-	if err != nil {
-		return err
-	}
-	*d = Duration(duration)
-	return nil
-}
 
 type EntityConfig struct {
 	//Filters        engine.Filters `json:"filters,omitempty"`
-	UpdateInterval Duration `yaml:"update_interval"`
+	UpdateInterval utils.Duration `yaml:"update_interval"`
 }
 
 type EntityI interface {

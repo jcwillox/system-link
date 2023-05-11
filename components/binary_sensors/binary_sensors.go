@@ -1,9 +1,19 @@
 package binary_sensors
 
-import "github.com/jcwillox/system-bridge/components"
+import (
+	"github.com/jcwillox/go-yamltools"
+	"github.com/jcwillox/system-bridge/components"
+	"gopkg.in/yaml.v3"
+)
 
 type Config struct {
 	Status *StatusConfig `yaml:"status,omitempty"`
+}
+
+func (c *Config) UnmarshalYAML(n *yaml.Node) error {
+	n = yamltools.EnsureMapMap(n)
+	type ConfigT Config
+	return n.Decode((*ConfigT)(c))
 }
 
 type BinarySensorEntity struct {
