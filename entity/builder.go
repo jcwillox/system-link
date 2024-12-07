@@ -62,21 +62,16 @@ type Config struct {
 }
 
 type BuildConfig struct {
-	// available after first setup function is called
-	//client    mqtt.Client
-	//scheduler *gocron.Scheduler
-
 	setupFns   []SetupFn
 	cleanupFns []func()
 
 	componentType Domain
 	objectID      string
-	//configTopic   string
-	//onCommand mqtt.MessageHandler
-	// common attributes
 
 	stateTopic   string
 	commandTopic string
+
+	disableAvailability bool
 
 	Config
 }
@@ -189,6 +184,16 @@ func (e *BuildConfig) DisabledByDefault() *BuildConfig {
 	return e
 }
 
+func (e *BuildConfig) EnableAvailability() *BuildConfig {
+	e.disableAvailability = false
+	return e
+}
+
+func (e *BuildConfig) DisableAvailability() *BuildConfig {
+	e.disableAvailability = true
+	return e
+}
+
 func (e *BuildConfig) Interval(interval time.Duration) *BuildConfig {
 	if e.Config.UpdateInterval == 0 {
 		e.Config.UpdateInterval = utils.Duration(interval)
@@ -279,16 +284,13 @@ func (e *BuildConfig) Schedule(handler SetupFn) *BuildConfig {
 func NewEntity(cfg Config) *BuildConfig {
 	return (&BuildConfig{Config: cfg}).
 		OnSetup(func(e *Entity, client mqtt.Client, scheduler *gocron.Scheduler) error {
-			//e.client = client
-			//e.scheduler = scheduler
-
-			// marshal config
-			data, err := json.Marshal(e.DiscoveryConfig())
+			discoveryConfig := e.DiscoveryConfig()
+			data, err := json.Marshal(discoveryConfig)
 			if err != nil {
 				log.Err(err).Msg("failed to marshal item")
 			}
 
-			log.Info().Interface("config", e.DiscoveryConfig()).Msg("discovery config")
+			log.Info().Interface("config", discoveryConfig).Msg("discovery config")
 
 			configTopic := path.Join(config.Config.MQTT.DiscoveryTopic, e.config.componentType.String(), config.HostID, e.config.objectID, "config")
 			token := client.Publish(configTopic, 0, true, data)

@@ -71,6 +71,15 @@ func (e *Entity) StateTopic() string {
 func (e *Entity) CommandTopic() string {
 	return e.config.commandTopic
 }
+func (e *Entity) PayloadOn() string {
+	return e.config.Config.PayloadOn
+}
+func (e *Entity) PayloadOff() string {
+	return e.config.Config.PayloadOff
+}
+func (e *Entity) AvailabilityEnabled() bool {
+	return !e.config.disableAvailability
+}
 
 func SetupAll(entities []*Entity, client mqtt.Client, scheduler *gocron.Scheduler) error {
 	for _, entity := range entities {

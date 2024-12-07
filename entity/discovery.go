@@ -2,7 +2,6 @@ package entity
 
 import (
 	"github.com/jcwillox/system-bridge/config"
-	"path"
 )
 
 type DiscoveryConfig struct {
@@ -27,6 +26,9 @@ type DiscoveryConfig struct {
 	StateTopic   string `json:"state_topic,omitempty"`
 	CommandTopic string `json:"command_topic,omitempty"`
 
+	PayloadOn  string `json:"payload_on,omitempty"`
+	PayloadOff string `json:"payload_off,omitempty"`
+
 	Availability []AvailabilityItem  `json:"availability,omitempty"`
 	Device       config.DeviceConfig `json:"device,omitempty"`
 }
@@ -36,7 +38,7 @@ type AvailabilityItem struct {
 }
 
 func (e *Entity) DiscoveryConfig() DiscoveryConfig {
-	return DiscoveryConfig{
+	discoveryConfig := DiscoveryConfig{
 		Name:                      e.Name(),
 		Icon:                      e.Icon(),
 		UniqueID:                  e.UniqueID(),
@@ -50,9 +52,12 @@ func (e *Entity) DiscoveryConfig() DiscoveryConfig {
 		DeviceClass:               e.DeviceClass(),
 		StateTopic:                e.StateTopic(),
 		CommandTopic:              e.CommandTopic(),
-		Availability: []AvailabilityItem{
-			{Topic: path.Join(config.Config.MQTT.BaseTopic, config.HostID, "availability")},
-		},
-		Device: config.Device,
+		PayloadOn:                 e.PayloadOn(),
+		PayloadOff:                e.PayloadOff(),
+		Device:                    config.Device,
 	}
+	if e.AvailabilityEnabled() {
+		discoveryConfig.Availability = []AvailabilityItem{{Topic: config.Config.AvailabilityTopic()}}
+	}
+	return discoveryConfig
 }

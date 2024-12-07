@@ -3,9 +3,12 @@ package config
 import (
 	"github.com/ilyakaznacheev/cleanenv"
 	"github.com/rs/zerolog/log"
+	"path"
 )
 
-var Config struct {
+var Config CoreConfig
+
+type CoreConfig struct {
 	MQTT struct {
 		Host           string `yaml:"host"`
 		Port           string `yaml:"port"`
@@ -17,6 +20,10 @@ var Config struct {
 	} `yaml:"mqtt"`
 	LogLevel     string `yaml:"log_level" env-default:"info"`
 	LogLevelMqtt string `yaml:"log_level_mqtt" env-default:"error"`
+}
+
+func (c *CoreConfig) AvailabilityTopic() string {
+	return path.Join(Config.MQTT.BaseTopic, HostID, "availability")
 }
 
 func init() {
