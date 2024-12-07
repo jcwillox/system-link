@@ -1,27 +1,23 @@
 package sensors
 
 import (
-	"github.com/jcwillox/system-bridge/components"
+	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"github.com/go-co-op/gocron"
+	"github.com/jcwillox/system-bridge/entity"
 	"github.com/shirou/gopsutil/v3/host"
 	"time"
 )
 
-type UptimeConfig = components.EntityConfig
-
-func NewUptime(cfg UptimeConfig) *SensorEntity {
-	e := NewSensor(cfg)
-	e.ObjectID = "uptime"
-	e.DeviceClass = "timestamp"
-
-	e.SetName("Uptime")
-	e.SetStateHandler(func() (interface{}, error) {
-		uptime, err := host.BootTime()
-		if err != nil {
-			return nil, err
-		}
-		return time.Unix(int64(uptime), 0).Format(time.RFC3339), nil
-	})
-
-	e.SetDynamicOptions()
-	return e
+func NewUptime(cfg entity.Config) *entity.Entity {
+	return entity.NewEntity(cfg).
+		Type(entity.DomainSensor).
+		ID("uptime").
+		DeviceClass("timestamp").
+		Schedule(func(e *entity.Entity, client mqtt.Client, scheduler *gocron.Scheduler) error {
+			uptime, err := host.BootTime()
+			if err != nil {
+				return err
+			}
+			return e.PublishState(client, time.Unix(int64(uptime), 0).Format(time.RFC3339))
+		}).Build()
 }

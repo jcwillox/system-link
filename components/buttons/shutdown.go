@@ -2,26 +2,20 @@ package buttons
 
 import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
-	"github.com/jcwillox/system-bridge/components"
+	"github.com/jcwillox/system-bridge/entity"
 	"github.com/rs/zerolog/log"
 	"os/exec"
 )
 
-type ShutdownConfig = components.EntityConfig
-
-func NewShutdown(cfg ShutdownConfig) *ButtonEntity {
-	e := NewButton(cfg)
-	e.ObjectID = "shutdown"
-	e.Icon = "mdi:power"
-
-	e.SetName("Shutdown")
-	e.SetPressHandler(func(client mqtt.Client) {
-		err := exec.Command("shutdown", "/s", "/t", "0").Run()
-		if err != nil {
-			log.Err(err).Msg("failed to run shutdown command")
-		}
-	})
-
-	e.SetDynamicOptions()
-	return e
+func NewShutdown(cfg entity.Config) *entity.Entity {
+	return entity.NewEntity(cfg).
+		Type(entity.DomainButton).
+		ID("shutdown").
+		Icon("mdi:power").
+		OnCommand(func(client mqtt.Client, message mqtt.Message) {
+			err := exec.Command("shutdown", "/s", "/t", "0").Run()
+			if err != nil {
+				log.Err(err).Msg("failed to run shutdown command")
+			}
+		}).Build()
 }

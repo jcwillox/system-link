@@ -1,13 +1,12 @@
-package binary_sensors
+package switches
 
 import (
 	"github.com/jcwillox/go-yamltools"
-	"github.com/jcwillox/system-bridge/entity"
 	"gopkg.in/yaml.v3"
 )
 
 type Config struct {
-	Status *entity.Config `yaml:"status,omitempty"`
+	Cron CronConfig `yaml:"cron,omitempty"`
 }
 
 func (c *Config) UnmarshalYAML(n *yaml.Node) error {

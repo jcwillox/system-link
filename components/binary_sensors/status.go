@@ -1,25 +1,20 @@
 package binary_sensors
 
 import (
-	"github.com/jcwillox/system-bridge/components"
+	"github.com/jcwillox/system-bridge/config"
+	"github.com/jcwillox/system-bridge/entity"
+	"path"
 )
 
-type StatusConfig = components.EntityConfig
-
-func NewStatus(cfg StatusConfig) *BinarySensorEntity {
-	e := NewBinarySensor(cfg)
-	e.DeviceClass = "connectivity"
-	e.ObjectID = "status"
-
-	e.PayloadOn = "online"
-	e.PayloadOff = "offline"
-
-	e.SetName("Status")
-	e.SetDynamicOptions()
-
-	// repurpose availability as state
-	e.StateTopic = e.Availability[0].Topic
-	e.Availability = nil
-
-	return e
+func NewStatus(cfg entity.Config) *entity.Entity {
+	return entity.NewEntity(cfg).
+		Type(entity.DomainBinarySensor).
+		ID("status").
+		DeviceClass("connectivity").
+		PayloadOn("online").
+		PayloadOff("offline").
+		// repurpose availability as state
+		StateTopic(path.Join(config.Config.MQTT.BaseTopic, config.HostID, "availability")).
+		// todo disable availability for this entity
+		Build()
 }

@@ -2,36 +2,35 @@ package sensors
 
 import (
 	"errors"
-	"fmt"
-	"github.com/jcwillox/system-bridge/components"
+	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"github.com/go-co-op/gocron"
+	"github.com/jcwillox/system-bridge/entity"
 	"github.com/shirou/gopsutil/v3/cpu"
 	"time"
 )
 
 var ErrNoCPU = errors.New("no cpu found")
 
-type CPUConfig = components.EntityConfig
-
-func NewCPU(cfg CPUConfig) *SensorEntity {
-	e := NewSensor(cfg)
-	e.StateClass = "measurement"
-	e.ObjectID = "cpu"
-	e.Icon = "mdi:cpu-64-bit"
-	e.UnitOfMeasurement = "%"
-	e.SuggestedDisplayPrecision = 1
-
-	e.SetName("CPU")
-	e.SetStateHandler(func() (interface{}, error) {
-		percent, err := cpu.Percent(time.Second, false)
-		if err != nil {
-			return nil, err
-		}
-		if len(percent) == 0 {
-			return nil, ErrNoCPU
-		}
-		return fmt.Sprint(percent[0]), nil
-	})
-
-	e.SetDynamicOptions()
-	return e
+func NewCPU(cfg entity.Config) *entity.Entity {
+	return entity.NewEntity(cfg).
+		Type(entity.DomainSensor).
+		ID("cpu").
+		Name("CPU").
+		Icon("mdi:cpu-64-bit").
+		StateClass("measurement").
+		Unit("%").
+		Precision(1).
+		Schedule(func(e *entity.Entity, client mqtt.Client, scheduler *gocron.Scheduler) error {
+			percent, err := cpu.Percent(time.Second, false)
+			if err != nil {
+				return err
+			}
+			if len(percent) == 0 {
+				return ErrNoCPU
+			}
+			//if !entity.Filters(percent[0]) {
+			//	return nil
+			//}
+			return e.PublishState(client, percent[0])
+		}).Build()
 }

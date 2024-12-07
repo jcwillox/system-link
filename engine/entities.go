@@ -1,17 +1,18 @@
 package engine
 
 import (
-	"github.com/jcwillox/system-bridge/components"
 	"github.com/jcwillox/system-bridge/components/binary_sensors"
 	"github.com/jcwillox/system-bridge/components/buttons"
 	"github.com/jcwillox/system-bridge/components/sensors"
+	"github.com/jcwillox/system-bridge/components/updaters"
+	"github.com/jcwillox/system-bridge/entity"
 	"github.com/shirou/gopsutil/v3/disk"
 )
 
-func LoadEntities() []components.EntityI {
+func LoadEntities() []*entity.Entity {
 	cfg := LoadEntitiesConfig()
 
-	entities := make([]components.EntityI, 0,
+	entities := make([]*entity.Entity, 0,
 		len(cfg.Buttons)+
 			len(cfg.Sensors)+
 			len(cfg.BinarySensors),
@@ -96,6 +97,12 @@ func LoadEntities() []components.EntityI {
 	for _, entity := range cfg.BinarySensors {
 		if entity.Status != nil {
 			entities = append(entities, binary_sensors.NewStatus(*entity.Status))
+		}
+	}
+
+	for _, entity := range cfg.Updaters {
+		if entity.Update != nil {
+			entities = append(entities, updaters.NewUpdate(*entity.Update))
 		}
 	}
 
