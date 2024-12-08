@@ -3,21 +3,20 @@ package entity
 import (
 	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
-	"github.com/go-co-op/gocron"
+	"github.com/go-co-op/gocron/v2"
 	"github.com/rs/zerolog/log"
 )
-
-type EntityI interface {
-	Entity() *Entity
-}
-
-func (e *Entity) Entity() *Entity {
-	return e
-}
 
 type Entity struct {
 	config *BuildConfig
 }
+
+// Entity access shared root type on inherited models
+func (e *Entity) Entity() *Entity {
+	return e
+}
+
+/* PUBLIC ENTITY UTILS */
 
 func (e *Entity) PublishState(client mqtt.Client, state interface{}) error {
 	return e.PublishRawState(client, fmt.Sprint(state))
@@ -31,6 +30,8 @@ func (e *Entity) PublishRawState(client mqtt.Client, state interface{}) error {
 	}
 	return nil
 }
+
+/* PUBLIC GETTERS */
 
 func (e *Entity) Name() string {
 	return e.config.Config.Name
@@ -81,7 +82,9 @@ func (e *Entity) AvailabilityEnabled() bool {
 	return !e.config.disableAvailability
 }
 
-func SetupAll(entities []*Entity, client mqtt.Client, scheduler *gocron.Scheduler) error {
+/* INTERNAL AGGREGATE FUNCTIONS */
+
+func SetupAll(entities []*Entity, client mqtt.Client, scheduler gocron.Scheduler) error {
 	for _, entity := range entities {
 		for _, fn := range entity.config.setupFns {
 			err := fn(entity, client, scheduler)

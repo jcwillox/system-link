@@ -2,7 +2,7 @@ package sensors
 
 import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
-	"github.com/go-co-op/gocron"
+	"github.com/go-co-op/gocron/v2"
 	"github.com/jcwillox/system-bridge/entity"
 	"github.com/rs/zerolog/log"
 	"github.com/shirou/gopsutil/v3/mem"
@@ -19,7 +19,7 @@ func NewMemory(cfg entity.Config) *entity.Entity {
 		StateClass("measurement").
 		Unit("%").
 		Precision(1).
-		Schedule(func(e *entity.Entity, client mqtt.Client, scheduler *gocron.Scheduler) error {
+		Schedule(func(e *entity.Entity, client mqtt.Client, scheduler gocron.Scheduler) error {
 			memory, err := mem.VirtualMemory()
 			if err != nil {
 				return err
@@ -38,7 +38,7 @@ func NewMemoryUsed(cfg entity.Config) *entity.Entity {
 		DeviceClass("data_size").
 		Unit("GiB").
 		Precision(1).
-		Schedule(func(e *entity.Entity, client mqtt.Client, scheduler *gocron.Scheduler) error {
+		Schedule(func(e *entity.Entity, client mqtt.Client, scheduler gocron.Scheduler) error {
 			memory, err := mem.VirtualMemory()
 			if err != nil {
 				return err
@@ -58,7 +58,7 @@ func NewMemoryFree(cfg entity.Config) *entity.Entity {
 		DeviceClass("data_size").
 		Unit("GiB").
 		Precision(1).
-		Schedule(func(e *entity.Entity, client mqtt.Client, scheduler *gocron.Scheduler) error {
+		Schedule(func(e *entity.Entity, client mqtt.Client, scheduler gocron.Scheduler) error {
 			memory, err := mem.VirtualMemory()
 			if err != nil {
 				return err

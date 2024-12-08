@@ -2,6 +2,7 @@ package buttons
 
 import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"github.com/go-co-op/gocron/v2"
 	"github.com/google/shlex"
 	"github.com/jcwillox/system-bridge/entity"
 	"github.com/rs/zerolog/log"
@@ -23,7 +24,7 @@ func NewCustom(cfg CustomConfig) *entity.Entity {
 	return entity.NewEntity(cfg.Config).
 		Type(entity.DomainButton).
 		ObjectID(cfg.UniqueID).
-		OnCommand(func(client mqtt.Client, message mqtt.Message) {
+		OnCommand(func(entity *entity.Entity, client mqtt.Client, scheduler gocron.Scheduler, message mqtt.Message) {
 			args, err := shlex.Split(cfg.Command)
 			if err != nil {
 				log.Err(err).Str("command", cfg.Command).Msg("failed to parse command")

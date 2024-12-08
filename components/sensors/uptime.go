@@ -2,7 +2,7 @@ package sensors
 
 import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
-	"github.com/go-co-op/gocron"
+	"github.com/go-co-op/gocron/v2"
 	"github.com/jcwillox/system-bridge/entity"
 	"github.com/shirou/gopsutil/v3/host"
 	"time"
@@ -13,7 +13,7 @@ func NewUptime(cfg entity.Config) *entity.Entity {
 		Type(entity.DomainSensor).
 		ID("uptime").
 		DeviceClass("timestamp").
-		Schedule(func(e *entity.Entity, client mqtt.Client, scheduler *gocron.Scheduler) error {
+		Schedule(func(e *entity.Entity, client mqtt.Client, scheduler gocron.Scheduler) error {
 			uptime, err := host.BootTime()
 			if err != nil {
 				return err

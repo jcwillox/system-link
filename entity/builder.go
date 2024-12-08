@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
-	"github.com/go-co-op/gocron"
+	"github.com/go-co-op/gocron/v2"
 	"github.com/jcwillox/system-bridge/config"
 	"github.com/jcwillox/system-bridge/utils"
 	"github.com/rs/zerolog/log"
@@ -14,8 +14,8 @@ import (
 	"time"
 )
 
-type SetupFn = func(entity *Entity, client mqtt.Client, scheduler *gocron.Scheduler) error
-type MessageFn = func(entity *Entity, client mqtt.Client, scheduler *gocron.Scheduler, message mqtt.Message)
+type SetupFn = func(entity *Entity, client mqtt.Client, scheduler gocron.Scheduler) error
+type MessageFn = func(entity *Entity, client mqtt.Client, scheduler gocron.Scheduler, message mqtt.Message)
 
 type Domain struct {
 	slug string
@@ -26,11 +26,11 @@ func (d Domain) String() string {
 }
 
 var (
-	DomainBinarySensor Domain = Domain{"binary_sensor"}
-	DomainButton       Domain = Domain{"button"}
-	DomainSensor       Domain = Domain{"sensor"}
-	DomainSwitch       Domain = Domain{"switch"}
-	DomainUpdate       Domain = Domain{"update"}
+	DomainBinarySensor = Domain{"binary_sensor"}
+	DomainButton       = Domain{"button"}
+	DomainSensor       = Domain{"sensor"}
+	DomainSwitch       = Domain{"switch"}
+	DomainUpdate       = Domain{"update"}
 )
 
 type Config struct {
@@ -222,9 +222,11 @@ func (e *BuildConfig) OnCleanup(cleanup func()) *BuildConfig {
 	return e
 }
 
-func (e *BuildConfig) OnCommand(handler mqtt.MessageHandler) *BuildConfig {
-	e.DefaultCommandTopic().OnSetup(func(entity *Entity, client mqtt.Client, scheduler *gocron.Scheduler) error {
-		token := client.Subscribe(e.commandTopic, 0, handler)
+func (e *BuildConfig) OnCommand(handler MessageFn) *BuildConfig {
+	e.DefaultCommandTopic().OnSetup(func(entity *Entity, client mqtt.Client, scheduler gocron.Scheduler) error {
+		token := client.Subscribe(e.commandTopic, 0, func(client mqtt.Client, message mqtt.Message) {
+			handler(entity, client, scheduler, message)
+		})
 		if token.Wait() && token.Error() != nil {
 			log.Err(token.Error()).Str("name", e.Config.Name).Msg("failed subscribing to command topic")
 		} else {
@@ -240,9 +242,11 @@ func (e *BuildConfig) OnCommand(handler mqtt.MessageHandler) *BuildConfig {
 	return e
 }
 
-func (e *BuildConfig) OnState(handler mqtt.MessageHandler) *BuildConfig {
-	e.DefaultStateTopic().OnSetup(func(entity *Entity, client mqtt.Client, scheduler *gocron.Scheduler) error {
-		token := client.Subscribe(e.stateTopic, 0, handler)
+func (e *BuildConfig) OnState(handler MessageFn) *BuildConfig {
+	e.DefaultStateTopic().OnSetup(func(entity *Entity, client mqtt.Client, scheduler gocron.Scheduler) error {
+		token := client.Subscribe(e.stateTopic, 0, func(client mqtt.Client, message mqtt.Message) {
+			handler(entity, client, scheduler, message)
+		})
 		if token.Wait() && token.Error() != nil {
 			log.Err(token.Error()).Str("name", e.Config.Name).Msg("failed subscribing to state topic")
 		} else {
@@ -259,21 +263,25 @@ func (e *BuildConfig) OnState(handler mqtt.MessageHandler) *BuildConfig {
 }
 
 func (e *BuildConfig) Schedule(handler SetupFn) *BuildConfig {
-	e.DefaultStateTopic().OnSetup(func(entity *Entity, client mqtt.Client, scheduler *gocron.Scheduler) error {
+	e.DefaultStateTopic().OnSetup(func(entity *Entity, client mqtt.Client, scheduler gocron.Scheduler) error {
 		log.Info().Str("name", e.Config.Name).Dur("interval", time.Duration(e.UpdateInterval)).Msg("scheduling update")
-		job, err := scheduler.Every(time.Duration(e.UpdateInterval)).Do(func() {
+
+		job, err := scheduler.NewJob(gocron.DurationJob(time.Duration(e.UpdateInterval)), gocron.NewTask(func() {
 			err := handler(entity, client, scheduler)
 			if err != nil {
 				log.Err(err).Str("name", e.Config.Name).Msg("failed to update")
 			}
-		})
+		}))
 
 		if err != nil {
 			log.Err(err).Str("name", e.Config.Name).Msg("failed to schedule update")
 		}
 
 		e.OnCleanup(func() {
-			scheduler.RemoveByReference(job)
+			err := scheduler.RemoveJob(job.ID())
+			if err != nil {
+				log.Err(err).Str("name", e.Config.Name).Msg("failed to remove job")
+			}
 		})
 
 		return nil
@@ -283,7 +291,7 @@ func (e *BuildConfig) Schedule(handler SetupFn) *BuildConfig {
 
 func NewEntity(cfg Config) *BuildConfig {
 	return (&BuildConfig{Config: cfg}).
-		OnSetup(func(e *Entity, client mqtt.Client, scheduler *gocron.Scheduler) error {
+		OnSetup(func(e *Entity, client mqtt.Client, scheduler gocron.Scheduler) error {
 			discoveryConfig := e.DiscoveryConfig()
 			data, err := json.Marshal(discoveryConfig)
 			if err != nil {

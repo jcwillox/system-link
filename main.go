@@ -2,7 +2,7 @@ package main
 
 import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
-	"github.com/go-co-op/gocron"
+	"github.com/go-co-op/gocron/v2"
 	. "github.com/jcwillox/system-bridge/config"
 	"github.com/jcwillox/system-bridge/engine"
 	"github.com/jcwillox/system-bridge/entity"
@@ -10,7 +10,6 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 )
 
 func main() {
@@ -26,7 +25,10 @@ func main() {
 	// set will topic
 	opts.SetWill(availabilityTopic, "offline", 0, true)
 
-	scheduler := gocron.NewScheduler(time.Local)
+	scheduler, err := gocron.NewScheduler()
+	if err != nil {
+		log.Fatal().Err(err).Msg("failed to create scheduler")
+	}
 
 	// create entities list
 	entities := engine.LoadEntities()
@@ -70,7 +72,7 @@ func main() {
 	}
 
 	// start state machine
-	scheduler.StartAsync()
+	scheduler.Start()
 
 	// listen for stop signals
 	sig := make(chan os.Signal, 1)
@@ -79,6 +81,12 @@ func main() {
 	select {
 	//case <-disconnectMQTT:
 	case <-sig:
+	}
+
+	// shutdown scheduler
+	err = scheduler.Shutdown()
+	if err != nil {
+		log.Err(err).Msg("failed to shutdown scheduler")
 	}
 
 	// send will on graceful disconnect

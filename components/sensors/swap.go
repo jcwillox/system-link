@@ -2,7 +2,7 @@ package sensors
 
 import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
-	"github.com/go-co-op/gocron"
+	"github.com/go-co-op/gocron/v2"
 	"github.com/jcwillox/system-bridge/entity"
 	"github.com/shirou/gopsutil/v3/mem"
 )
@@ -16,7 +16,7 @@ func NewSwap(cfg entity.Config) *entity.Entity {
 		StateClass("measurement").
 		Unit("%").
 		Precision(2).
-		Schedule(func(e *entity.Entity, client mqtt.Client, scheduler *gocron.Scheduler) error {
+		Schedule(func(e *entity.Entity, client mqtt.Client, scheduler gocron.Scheduler) error {
 			devices, err := mem.SwapDevices()
 			//log.Debug().Msgf("swap devices: %v", devices)
 			if err != nil {
@@ -47,7 +47,7 @@ func NewSwapUsed(cfg entity.Config) *entity.Entity {
 		DeviceClass("data_size").
 		Unit("GiB").
 		Precision(1).
-		Schedule(func(e *entity.Entity, client mqtt.Client, scheduler *gocron.Scheduler) error {
+		Schedule(func(e *entity.Entity, client mqtt.Client, scheduler gocron.Scheduler) error {
 			devices, err := mem.SwapDevices()
 			if err != nil {
 				return err
@@ -74,7 +74,7 @@ func NewSwapFree(cfg entity.Config) *entity.Entity {
 		DeviceClass("data_size").
 		Unit("GiB").
 		Precision(1).
-		Schedule(func(e *entity.Entity, client mqtt.Client, scheduler *gocron.Scheduler) error {
+		Schedule(func(e *entity.Entity, client mqtt.Client, scheduler gocron.Scheduler) error {
 			devices, err := mem.SwapDevices()
 			if err != nil {
 				return err

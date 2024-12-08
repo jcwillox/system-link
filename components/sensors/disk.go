@@ -2,7 +2,7 @@ package sensors
 
 import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
-	"github.com/go-co-op/gocron"
+	"github.com/go-co-op/gocron/v2"
 	"github.com/jcwillox/system-bridge/entity"
 	"github.com/shirou/gopsutil/v3/disk"
 	"strings"
@@ -22,7 +22,7 @@ func NewDisk(cfg DiskConfig) *entity.Entity {
 		StateClass("measurement").
 		Unit("%").
 		Precision(1).
-		Schedule(func(e *entity.Entity, client mqtt.Client, scheduler *gocron.Scheduler) error {
+		Schedule(func(e *entity.Entity, client mqtt.Client, scheduler gocron.Scheduler) error {
 			usage, err := disk.Usage(cfg.Mountpoint)
 			if err != nil {
 				return err
@@ -42,7 +42,7 @@ func NewDiskUsed(cfg DiskConfig) *entity.Entity {
 		DeviceClass("data_size").
 		Unit("GiB").
 		Precision(1).
-		Schedule(func(e *entity.Entity, client mqtt.Client, scheduler *gocron.Scheduler) error {
+		Schedule(func(e *entity.Entity, client mqtt.Client, scheduler gocron.Scheduler) error {
 			usage, err := disk.Usage(cfg.Mountpoint)
 			if err != nil {
 				return err
@@ -61,7 +61,7 @@ func NewDiskFree(cfg DiskConfig) *entity.Entity {
 		DeviceClass("data_size").
 		Unit("GiB").
 		Precision(1).
-		Schedule(func(e *entity.Entity, client mqtt.Client, scheduler *gocron.Scheduler) error {
+		Schedule(func(e *entity.Entity, client mqtt.Client, scheduler gocron.Scheduler) error {
 			usage, err := disk.Usage(cfg.Mountpoint)
 			if err != nil {
 				return err
