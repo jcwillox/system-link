@@ -9,6 +9,7 @@ func NewStatus(cfg entity.Config) *entity.Entity {
 	return entity.NewEntity(cfg).
 		Type(entity.DomainBinarySensor).
 		ID("status").
+		EntityCategory("diagnostic").
 		DeviceClass("connectivity").
 		PayloadOn("online").
 		PayloadOff("offline").

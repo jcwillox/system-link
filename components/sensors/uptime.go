@@ -12,6 +12,7 @@ func NewUptime(cfg entity.Config) *entity.Entity {
 	return entity.NewEntity(cfg).
 		Type(entity.DomainSensor).
 		ID("uptime").
+		EntityCategory("diagnostic").
 		DeviceClass("timestamp").
 		Schedule(func(e *entity.Entity, client mqtt.Client, scheduler gocron.Scheduler) error {
 			uptime, err := host.BootTime()
