@@ -4,9 +4,11 @@ import (
 	"github.com/jcwillox/system-bridge/components/binary_sensors"
 	"github.com/jcwillox/system-bridge/components/buttons"
 	"github.com/jcwillox/system-bridge/components/sensors"
+	"github.com/jcwillox/system-bridge/components/switches"
 	"github.com/jcwillox/system-bridge/components/updaters"
 	"github.com/jcwillox/system-bridge/entity"
 	"github.com/shirou/gopsutil/v3/disk"
+	"runtime"
 )
 
 func LoadEntities() []*entity.Entity {
@@ -15,7 +17,9 @@ func LoadEntities() []*entity.Entity {
 	entities := make([]*entity.Entity, 0,
 		len(cfg.Buttons)+
 			len(cfg.Sensors)+
-			len(cfg.BinarySensors),
+			len(cfg.BinarySensors)+
+			len(cfg.Updaters)+
+			len(cfg.Switches),
 	)
 
 	for _, entity := range cfg.Buttons {
@@ -103,6 +107,12 @@ func LoadEntities() []*entity.Entity {
 	for _, entity := range cfg.Updaters {
 		if entity.Update != nil {
 			entities = append(entities, updaters.NewUpdate(*entity.Update))
+		}
+	}
+
+	for _, entity := range cfg.Switches {
+		if runtime.GOOS == "windows" && entity.Startup != nil {
+			entities = append(entities, switches.NewStartup(*entity.Startup))
 		}
 	}
 

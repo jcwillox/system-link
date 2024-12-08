@@ -1,10 +1,14 @@
 package config
 
 import (
+	_ "embed"
 	"github.com/ilyakaznacheev/cleanenv"
 	"github.com/rs/zerolog/log"
 	"path"
 )
+
+//go:embed system-bridge-hidden.vbs
+var FileSystemBridgeHiddenVBS []byte
 
 var Config CoreConfig
 
