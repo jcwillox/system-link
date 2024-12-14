@@ -26,3 +26,5 @@ node_modules/
 *.iml
 config.yaml
 /*.vbs
+
+dist/

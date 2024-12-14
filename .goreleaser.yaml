@@ -1,0 +1,48 @@
+# yaml-language-server: $schema=https://goreleaser.com/static/schema.json
+# vim: set ts=2 sw=2 tw=0 fo=cnqoj
+
+version: 2
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w -H=windowsgui
+
+archives:
+  - format: tar.gz
+    # this name template makes the OS and Arch compatible with the results of `uname`.
+    name_template: >-
+      {{ replace .ProjectName "-" "_" }}_
+      {{- .Os }}_
+      {{- .Arch }}
+      {{- if .Arm }}v{{ .Arm }}{{ end }}
+    # use zip for windows archives
+    format_overrides:
+      - goos: windows
+        format: zip
+
+nfpms:
+  - file_name_template: '{{ .PackageName }}_{{ .Version }}_{{- if eq .Arch "386" }}i386{{- else }}{{ .Arch }}{{ end }}'
+    license: MIT
+    maintainer: Joshua Cowie-Willox <joshwillox@gmail.com>
+    homepage: https://github.com/jcwillox/system-bridge
+    description: "A powerful bootstrapping utility for your dotfiles and system"
+    bindir: /usr/bin
+    formats:
+      - apk
+      - rpm
+      - deb
+
+checksum:
+  name_template: 'checksums.txt'

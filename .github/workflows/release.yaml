@@ -1,0 +1,60 @@
+name: "Release"
+
+on:
+  push:
+    branches:
+      - "beta"
+      - "alpha"
+  workflow_dispatch:
+    inputs:
+      release_type:
+        type: choice
+        description: "Release type"
+        default: "auto"
+        options:
+          - "auto"
+          - "patch"
+          - "minor"
+          - "major"
+
+env:
+  # renovate: datasource=github-releases depName=goreleaser packageName=goreleaser/goreleaser
+  GORELEASER_VERSION: 2.4.8
+
+jobs:
+  publish:
+    name: "Publish"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    steps:
+      - name: "Checkout the repository"
+        uses: actions/checkout@v4
+
+      - name: "Setup node"
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+
+      - name: "Setup go"
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: "Run GoReleaser"
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          version: ${{ env.GORELEASER_VERSION }}
+          install-only: true
+
+      - name: "Release Package 📦"
+        run: corepack enable && pnpm dlx @jcwillox/semantic-release-config
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SEMANTIC_RELEASE_GITHUB_DRAFT: true
+          SEMANTIC_RELEASE_FORCE_RELEASE: ${{ inputs.release_type }}
+          SEMANTIC_RELEASE_CMD_PUBLISH: |
+            echo "${nextRelease.notes}" > /tmp/release-notes.md
+            goreleaser release --release-notes /tmp/release-notes.md --clean
