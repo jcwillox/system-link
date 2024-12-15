@@ -5,7 +5,9 @@ import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
+	"gopkg.in/natefinch/lumberjack.v2"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -21,8 +23,22 @@ func (l MQTTLogger) Printf(format string, v ...interface{}) {
 }
 
 func setupLogging() {
-	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr, TimeFormat: time.DateTime})
+	consoleWriter := zerolog.ConsoleWriter{Out: os.Stderr, TimeFormat: time.DateTime}
 
+	fileWriter := zerolog.ConsoleWriter{
+		Out: &lumberjack.Logger{
+			Filename:   "system-bridge.log",
+			MaxSize:    1,
+			MaxBackups: 3,
+		},
+		NoColor:    true,
+		TimeFormat: time.DateTime,
+		FormatLevel: func(i interface{}) string {
+			return strings.ToUpper(i.(string))
+		},
+	}
+
+	log.Logger = log.Output(zerolog.MultiLevelWriter(consoleWriter, fileWriter))
 }
 
 func setupLogLevels() {

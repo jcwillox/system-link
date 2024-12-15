@@ -12,6 +12,7 @@ require (
 	github.com/shirou/gopsutil/v3 v3.24.5
 	golang.org/x/sys v0.22.0
 	golang.org/x/text v0.21.0
+	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 	gopkg.in/yaml.v3 v3.0.1
 )
 
