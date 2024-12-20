@@ -13,6 +13,5 @@ func NewStartup(cfg entity.Config) *entity.Entity {
 		Name("Run on boot").
 		Icon("mdi:restart").
 		EntityCategory("config").
-		DefaultStateTopic().
 		Build()
 }

@@ -12,7 +12,7 @@ import (
 )
 
 func createStartupEntry() error {
-	path, err := os.Executable()
+	exePath, err := os.Executable()
 	if err != nil {
 		return err
 	}
@@ -23,7 +23,7 @@ func createStartupEntry() error {
 	}
 	defer key.Close()
 
-	return key.SetStringValue("SystemBridge", path)
+	return key.SetStringValue("SystemBridge", exePath)
 }
 
 func deleteStartupEntry() error {
@@ -37,14 +37,23 @@ func deleteStartupEntry() error {
 }
 
 func hasStartupEntry() (bool, error) {
+	exePath, err := os.Executable()
+	if err != nil {
+		return false, err
+	}
+
 	key, err := registry.OpenKey(registry.CURRENT_USER, `Software\Microsoft\Windows\CurrentVersion\Run`, registry.QUERY_VALUE)
 	if err != nil {
 		return false, err
 	}
 	defer key.Close()
 
-	_, _, err = key.GetStringValue("SystemBridge")
+	startupPath, _, err := key.GetStringValue("SystemBridge")
 	if err != nil {
+		return false, nil
+	}
+
+	if startupPath != exePath {
 		return false, nil
 	}
 
@@ -59,34 +68,33 @@ func NewStartup(cfg entity.Config) *entity.Entity {
 		Icon("mdi:restart").
 		EntityCategory("config").
 		DefaultStateTopic().
-		OnCommand(func(entity *entity.Entity, client mqtt.Client, scheduler gocron.Scheduler, message mqtt.Message) {
-			log.Info().Bytes("payload", message.Payload()).Msg("startup:on-command")
+		OnCommand(func(e *entity.Entity, client mqtt.Client, scheduler gocron.Scheduler, message mqtt.Message) {
 			if string(message.Payload()) == "ON" {
 				err := createStartupEntry()
 				if err != nil {
 					log.Err(err).Msg("failed to create startup entry")
 					return
 				}
-				_ = entity.PublishState(client, "ON")
+				_ = e.PublishState(client, "ON")
 			} else if string(message.Payload()) == "OFF" {
 				err := deleteStartupEntry()
 				if err != nil {
 					log.Err(err).Msg("failed to delete startup entry")
 					return
 				}
-				_ = entity.PublishState(client, "OFF")
+				_ = e.PublishState(client, "OFF")
 			}
 		}).
-		OnSetup(func(entity *entity.Entity, client mqtt.Client, scheduler gocron.Scheduler) error {
+		OnSetup(func(e *entity.Entity, client mqtt.Client, scheduler gocron.Scheduler) error {
 			hasEntry, err := hasStartupEntry()
 			if err != nil {
 				log.Err(err).Msg("failed to check for startup entry")
 				return err
 			}
 			if hasEntry {
-				return entity.PublishState(client, "ON")
+				return e.PublishState(client, "ON")
 			} else {
-				return entity.PublishState(client, "OFF")
+				return e.PublishState(client, "OFF")
 			}
 		}).
 		Build()
