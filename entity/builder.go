@@ -44,6 +44,7 @@ type Config struct {
 
 	// `diagnostic`, `config`
 	EntityCategory string `json:"entity_category,omitempty"`
+	EntityPicture  string `json:"entity_picture,omitempty"`
 
 	UnitOfMeasurement         string `json:"unit_of_measurement,omitempty"`
 	SuggestedDisplayPrecision int    `json:"suggested_display_precision,omitempty"`
@@ -57,8 +58,9 @@ type Config struct {
 	//Filters        engine.Filters `json:"filters,omitempty"`
 	UpdateInterval utils.Duration `yaml:"update_interval"`
 
-	PayloadOn  string `json:"payload_on,omitempty"`
-	PayloadOff string `json:"payload_off,omitempty"`
+	PayloadOn      string `json:"payload_on,omitempty"`
+	PayloadOff     string `json:"payload_off,omitempty"`
+	PayloadInstall string `json:"payload_install,omitempty"`
 }
 
 type BuildConfig struct {
@@ -72,6 +74,7 @@ type BuildConfig struct {
 	commandTopic string
 
 	disableAvailability bool
+	runScheduleAtStart  bool
 
 	Config
 }
@@ -165,6 +168,16 @@ func (e *BuildConfig) CommandTopic(topic string) *BuildConfig {
 
 func (e *BuildConfig) EntityCategory(category string) *BuildConfig {
 	e.Config.EntityCategory = category
+	return e
+}
+
+func (e *BuildConfig) EntityPicture(picture string) *BuildConfig {
+	e.Config.EntityPicture = picture
+	return e
+}
+
+func (e *BuildConfig) PayloadInstall(payload string) *BuildConfig {
+	e.Config.PayloadInstall = payload
 	return e
 }
 
@@ -266,12 +279,18 @@ func (e *BuildConfig) Schedule(handler SetupFn) *BuildConfig {
 	e.DefaultStateTopic().OnSetup(func(entity *Entity, client mqtt.Client, scheduler gocron.Scheduler) error {
 		log.Info().Str("name", e.Config.Name).Dur("interval", time.Duration(e.UpdateInterval)).Msg("scheduling update")
 
+		var options []gocron.JobOption
+
+		if e.runScheduleAtStart {
+			options = append(options, gocron.WithStartAt(gocron.WithStartImmediately()))
+		}
+
 		job, err := scheduler.NewJob(gocron.DurationJob(time.Duration(e.UpdateInterval)), gocron.NewTask(func() {
 			err := handler(entity, client, scheduler)
 			if err != nil {
 				log.Err(err).Str("name", e.Config.Name).Msg("failed to update")
 			}
-		}))
+		}), options...)
 
 		if err != nil {
 			log.Err(err).Str("name", e.Config.Name).Msg("failed to schedule update")
@@ -286,6 +305,11 @@ func (e *BuildConfig) Schedule(handler SetupFn) *BuildConfig {
 
 		return nil
 	})
+	return e
+}
+
+func (e *BuildConfig) RunAtStart() *BuildConfig {
+	e.runScheduleAtStart = true
 	return e
 }
 

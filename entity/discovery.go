@@ -14,6 +14,7 @@ type DiscoveryConfig struct {
 	ValueTemplate       string `json:"value_template,omitempty"`
 
 	EntityCategory string `json:"entity_category,omitempty"`
+	EntityPicture  string `json:"entity_picture,omitempty"`
 
 	UnitOfMeasurement         string `json:"unit_of_measurement,omitempty"`
 	SuggestedDisplayPrecision int    `json:"suggested_display_precision,omitempty"`
@@ -26,8 +27,9 @@ type DiscoveryConfig struct {
 	StateTopic   string `json:"state_topic,omitempty"`
 	CommandTopic string `json:"command_topic,omitempty"`
 
-	PayloadOn  string `json:"payload_on,omitempty"`
-	PayloadOff string `json:"payload_off,omitempty"`
+	PayloadOn      string `json:"payload_on,omitempty"`
+	PayloadOff     string `json:"payload_off,omitempty"`
+	PayloadInstall string `json:"payload_install,omitempty"`
 
 	Availability []AvailabilityItem  `json:"availability,omitempty"`
 	Device       config.DeviceConfig `json:"device,omitempty"`
@@ -46,6 +48,7 @@ func (e *Entity) DiscoveryConfig() DiscoveryConfig {
 		JsonAttributesTopic:       e.JsonAttributesTopic(),
 		ValueTemplate:             e.ValueTemplate(),
 		EntityCategory:            e.EntityCategory(),
+		EntityPicture:             e.EntityPicture(),
 		UnitOfMeasurement:         e.Unit(),
 		SuggestedDisplayPrecision: e.Precision(),
 		StateClass:                e.StateClass(),
@@ -54,6 +57,7 @@ func (e *Entity) DiscoveryConfig() DiscoveryConfig {
 		CommandTopic:              e.CommandTopic(),
 		PayloadOn:                 e.PayloadOn(),
 		PayloadOff:                e.PayloadOff(),
+		PayloadInstall:            e.PayloadInstall(),
 		Device:                    config.Device,
 	}
 	if e.AvailabilityEnabled() {

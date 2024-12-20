@@ -54,6 +54,9 @@ func (e *Entity) ValueTemplate() string {
 func (e *Entity) EntityCategory() string {
 	return e.config.Config.EntityCategory
 }
+func (e *Entity) EntityPicture() string {
+	return e.config.Config.EntityPicture
+}
 func (e *Entity) Unit() string {
 	return e.config.Config.UnitOfMeasurement
 }
@@ -77,6 +80,9 @@ func (e *Entity) PayloadOn() string {
 }
 func (e *Entity) PayloadOff() string {
 	return e.config.Config.PayloadOff
+}
+func (e *Entity) PayloadInstall() string {
+	return e.config.Config.PayloadInstall
 }
 func (e *Entity) AvailabilityEnabled() bool {
 	return !e.config.disableAvailability
