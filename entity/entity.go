@@ -31,6 +31,11 @@ func (e *Entity) PublishRawState(client mqtt.Client, state interface{}) error {
 	return nil
 }
 
+func (e *Entity) OnCleanup(fn func()) *Entity {
+	e.config.OnCleanup(fn)
+	return e
+}
+
 /* PUBLIC GETTERS */
 
 func (e *Entity) Name() string {
