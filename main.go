@@ -6,15 +6,40 @@ import (
 	. "github.com/jcwillox/system-bridge/config"
 	"github.com/jcwillox/system-bridge/engine"
 	"github.com/jcwillox/system-bridge/entity"
+	"github.com/jcwillox/system-bridge/utils"
+	"github.com/jcwillox/system-bridge/utils/update"
 	"github.com/rs/zerolog/log"
 	"os"
 	"os/signal"
 	"syscall"
 )
 
+var version = "0.0.0"
+
 func main() {
+	Version = version
 	// setup logging & load config
-	// TODO: ensure single instance
+	update.Cleanup()
+
+	instanceLock, err := utils.NewInstanceLock()
+	if err != nil {
+		log.Fatal().Err(err).Msg("failed to create instance lock")
+		return
+	}
+
+	err = instanceLock.KillLockedPid()
+	if err != nil {
+		log.Fatal().Err(err).Msg("failed to kill locked pid")
+		return
+	}
+
+	err = instanceLock.Lock()
+	if err != nil {
+		log.Fatal().Err(err).Msg("failed to lock instance")
+		return
+	}
+
+	defer instanceLock.Unlock()
 
 	availabilityTopic := Config.AvailabilityTopic()
 	log.Debug().Str("topic", availabilityTopic).Msg("availability topic")

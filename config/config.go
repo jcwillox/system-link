@@ -7,10 +7,11 @@ import (
 	"path"
 )
 
-//go:embed system-bridge-hidden.vbs
-var FileSystemBridgeHiddenVBS []byte
-
-var Config CoreConfig
+var (
+	RepoUrl = "https://github.com/jcwillox/system-bridge"
+	Version string
+	Config  CoreConfig
+)
 
 type CoreConfig struct {
 	MQTT struct {

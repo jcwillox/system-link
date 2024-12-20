@@ -33,7 +33,7 @@ func setupDeviceConfig() {
 		Name:         info.Hostname,
 		Manufacturer: info.OS,
 		Model:        info.Platform,
-		SwVersion:    "0.1.0",
+		SwVersion:    Version,
 		HwVersion:    hwVersion,
 	}
 }
