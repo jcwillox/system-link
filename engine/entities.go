@@ -7,7 +7,7 @@ import (
 	"github.com/jcwillox/system-bridge/components/switches"
 	"github.com/jcwillox/system-bridge/components/updaters"
 	"github.com/jcwillox/system-bridge/entity"
-	"github.com/shirou/gopsutil/v3/disk"
+	"github.com/shirou/gopsutil/v4/disk"
 	"runtime"
 )
 

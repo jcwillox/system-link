@@ -5,7 +5,7 @@ import (
 	"github.com/go-co-op/gocron/v2"
 	"github.com/jcwillox/system-bridge/entity"
 	"github.com/rs/zerolog/log"
-	"github.com/shirou/gopsutil/v3/mem"
+	"github.com/shirou/gopsutil/v4/mem"
 )
 
 const Gibibyte = 1024 * 1024 * 1024

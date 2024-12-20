@@ -2,7 +2,7 @@ package config
 
 import (
 	"github.com/rs/zerolog/log"
-	"github.com/shirou/gopsutil/v3/host"
+	"github.com/shirou/gopsutil/v4/host"
 	"strings"
 )
 
