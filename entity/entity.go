@@ -23,6 +23,10 @@ func (e *Entity) PublishState(client mqtt.Client, state interface{}) error {
 }
 
 func (e *Entity) PublishRawState(client mqtt.Client, state interface{}) error {
+	if e.config.stateTopic == "" {
+		log.Warn().Interface("state", state).Msg("publish failed as entity does not have a state topic")
+		return nil
+	}
 	token := client.Publish(e.config.stateTopic, 0, true, state)
 	if token.Wait() && token.Error() != nil {
 		log.Err(token.Error()).Caller().Msg("failed publishing state")

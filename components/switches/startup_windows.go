@@ -58,6 +58,7 @@ func NewStartup(cfg entity.Config) *entity.Entity {
 		Name("Run on boot").
 		Icon("mdi:restart").
 		EntityCategory("config").
+		DefaultStateTopic().
 		OnCommand(func(entity *entity.Entity, client mqtt.Client, scheduler gocron.Scheduler, message mqtt.Message) {
 			log.Info().Bytes("payload", message.Payload()).Msg("startup:on-command")
 			if string(message.Payload()) == "ON" {
