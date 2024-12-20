@@ -2,4 +2,7 @@ version: '3'
 
 tasks:
   build:
-    cmd: go build -trimpath -ldflags '-s -w -H=windowsgui'
+    cmd: go build -trimpath -ldflags '-s -w -H=windowsgui' -o tests/
+
+  build:all:
+    cmd: goreleaser release --clean --snapshot

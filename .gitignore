@@ -24,8 +24,8 @@ node_modules/
 # IDE files
 .idea/
 *.iml
-config.yaml
 /*.vbs
 
 dist/
 /*.log
+tests/*
