@@ -35,6 +35,12 @@ func LoadEntities() []*entity.Entity {
 		if entity.Sleep != nil {
 			entities = append(entities, buttons.NewSleep(*entity.Sleep))
 		}
+		if entity.Reload != nil {
+			entities = append(entities, buttons.NewReload(*entity.Reload))
+		}
+		if entity.Exit != nil {
+			entities = append(entities, buttons.NewExit(*entity.Exit))
+		}
 	}
 
 	for _, entity := range cfg.Sensors {
