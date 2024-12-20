@@ -104,7 +104,7 @@ func main() {
 	signal.Notify(sig, os.Interrupt, syscall.SIGTERM)
 
 	select {
-	//case <-disconnectMQTT:
+	case <-ShutdownChannel:
 	case <-sig:
 	}
 

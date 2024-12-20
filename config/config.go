@@ -8,9 +8,10 @@ import (
 )
 
 var (
-	RepoUrl = "https://github.com/jcwillox/system-bridge"
-	Version string
-	Config  CoreConfig
+	RepoUrl         = "https://github.com/jcwillox/system-bridge"
+	Version         string
+	Config          CoreConfig
+	ShutdownChannel = make(chan bool)
 )
 
 type CoreConfig struct {
