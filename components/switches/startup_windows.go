@@ -5,22 +5,14 @@ package switches
 import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/go-co-op/gocron/v2"
-	"github.com/jcwillox/system-bridge/config"
 	"github.com/jcwillox/system-bridge/entity"
 	"github.com/rs/zerolog/log"
 	"golang.org/x/sys/windows/registry"
 	"os"
-	"path/filepath"
 )
 
 func createStartupEntry() error {
-	cwd, err := os.Getwd()
-	if err != nil {
-		return err
-	}
-
-	vbsPath := filepath.Join(cwd, "system-bridge-hidden.vbs")
-	err = os.WriteFile(vbsPath, config.FileSystemBridgeHiddenVBS, 0777)
+	path, err := os.Executable()
 	if err != nil {
 		return err
 	}
@@ -31,13 +23,7 @@ func createStartupEntry() error {
 	}
 	defer key.Close()
 
-	wScriptPath := filepath.Join(os.Getenv("SystemRoot"), "System32", "WScript.exe")
-	err = key.SetStringValue("SystemBridge", `"`+wScriptPath+`" "`+vbsPath+`"`)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return key.SetStringValue("SystemBridge", path)
 }
 
 func deleteStartupEntry() error {
@@ -47,13 +33,7 @@ func deleteStartupEntry() error {
 		return err
 	}
 	defer key.Close()
-
-	err = key.DeleteValue("SystemBridge")
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return key.DeleteValue("SystemBridge")
 }
 
 func hasStartupEntry() (bool, error) {
@@ -78,13 +58,8 @@ func NewStartup(cfg entity.Config) *entity.Entity {
 		Name("Run on boot").
 		Icon("mdi:restart").
 		EntityCategory("config").
-		OnState(func(entity *entity.Entity, client mqtt.Client, scheduler gocron.Scheduler, message mqtt.Message) {
-			// print message
-			log.Info().Bytes("payload", message.Payload()).Msg("Startup:OnState")
-			// check changed and update
-		}).
 		OnCommand(func(entity *entity.Entity, client mqtt.Client, scheduler gocron.Scheduler, message mqtt.Message) {
-			log.Info().Bytes("payload", message.Payload()).Msg("Startup:OnCommand")
+			log.Info().Bytes("payload", message.Payload()).Msg("startup:on-command")
 			if string(message.Payload()) == "ON" {
 				err := createStartupEntry()
 				if err != nil {
