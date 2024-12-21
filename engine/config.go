@@ -44,21 +44,17 @@ func (c *EntitiesConfig) LoadEntities() []*entity.Entity {
 	return entities
 }
 
-type Config struct {
-	Entities EntitiesConfig `yaml:"entities"`
-}
-
 func LoadEntities() []*entity.Entity {
 	data, err := os.ReadFile(config.Path())
 	if err != nil {
 		log.Fatal().Err(err).Msg("fatal error reading entities config")
 	}
 
-	cfg := Config{}
+	cfg := EntitiesConfig{}
 	if err = yaml.Unmarshal(data, &cfg); err != nil {
 		fmt.Println(yaml.FormatError(err, true, true))
 		log.Fatal().Msg("fatal error parsing entities config")
 	}
 
-	return cfg.Entities.LoadEntities()
+	return cfg.LoadEntities()
 }
