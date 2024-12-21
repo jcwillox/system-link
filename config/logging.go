@@ -22,7 +22,7 @@ func (l MQTTLogger) Printf(format string, v ...interface{}) {
 	log.WithLevel(l.Lvl).Msgf("[MQTT] "+format, v...)
 }
 
-func setupLogging() {
+func SetupLogging() {
 	consoleWriter := zerolog.ConsoleWriter{Out: os.Stderr, TimeFormat: time.DateTime}
 
 	fileWriter := zerolog.ConsoleWriter{
@@ -41,7 +41,7 @@ func setupLogging() {
 	log.Logger = log.Output(zerolog.MultiLevelWriter(consoleWriter, fileWriter))
 }
 
-func setupLogLevels() {
+func SetLogLevels() {
 	// set log level
 	level, err := zerolog.ParseLevel(Config.LogLevel)
 	log.Info().Str("lvl", Config.LogLevel).Msg("log level requested")

@@ -19,7 +19,7 @@ type DeviceConfig struct {
 	HwVersion        string   `json:"hw_version,omitempty"`
 }
 
-func setupDeviceConfig() {
+func SetupDeviceConfig() {
 	info, err := host.Info()
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed to get host info")

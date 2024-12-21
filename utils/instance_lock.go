@@ -2,6 +2,7 @@ package utils
 
 import (
 	"errors"
+	"github.com/rs/zerolog/log"
 	"github.com/shirou/gopsutil/v4/process"
 	"os"
 	"path/filepath"
@@ -26,8 +27,8 @@ func (l InstanceLock) Lock() error {
 }
 
 // Unlock removes the lock file
-func (l InstanceLock) Unlock() error {
-	return os.Remove(l.lockFile)
+func (l InstanceLock) Unlock() {
+	_ = os.Remove(l.lockFile)
 }
 
 // LockedPid returns the pid in the lock file
@@ -77,4 +78,26 @@ func (l InstanceLock) KillLockedPid() error {
 
 	_, err = proc2.Wait()
 	return err
+}
+
+func LockAndKill() *InstanceLock {
+	instanceLock, err := NewInstanceLock()
+	if err != nil {
+		log.Fatal().Err(err).Msg("failed to create instance lock")
+		return nil
+	}
+
+	err = instanceLock.KillLockedPid()
+	if err != nil {
+		log.Fatal().Err(err).Msg("failed to kill locked pid")
+		return nil
+	}
+
+	err = instanceLock.Lock()
+	if err != nil {
+		log.Fatal().Err(err).Msg("failed to lock instance")
+		return nil
+	}
+
+	return &instanceLock
 }

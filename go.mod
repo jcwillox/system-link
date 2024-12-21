@@ -3,11 +3,11 @@ module github.com/jcwillox/system-bridge
 go 1.23
 
 require (
+	github.com/creasty/defaults v1.8.0
 	github.com/eclipse/paho.mqtt.golang v1.5.0
 	github.com/go-co-op/gocron/v2 v2.14.0
 	github.com/goccy/go-yaml v1.15.12
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510
-	github.com/ilyakaznacheev/cleanenv v1.5.0
 	github.com/rs/zerolog v1.33.0
 	github.com/shirou/gopsutil/v4 v4.24.11
 	golang.org/x/sys v0.28.0
@@ -16,14 +16,11 @@ require (
 )
 
 require (
-	github.com/BurntSushi/toml v1.4.0 // indirect
 	github.com/ebitengine/purego v0.8.1 // indirect
 	github.com/go-ole/go-ole v1.3.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/websocket v1.5.3 // indirect
-	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/jonboulle/clockwork v0.4.0 // indirect
-	github.com/kr/pretty v0.3.1 // indirect
 	github.com/lufia/plan9stats v0.0.0-20240909124753-873cd0166683 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
@@ -35,6 +32,4 @@ require (
 	golang.org/x/exp v0.0.0-20241217172543-b2144cdd0a67 // indirect
 	golang.org/x/net v0.33.0 // indirect
 	golang.org/x/sync v0.10.0 // indirect
-	gopkg.in/yaml.v3 v3.0.1 // indirect
-	olympos.io/encoding/edn v0.0.0-20201019073823-d3554ca0b0a3 // indirect
 )
