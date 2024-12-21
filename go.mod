@@ -6,6 +6,7 @@ require (
 	github.com/creasty/defaults v1.8.0
 	github.com/eclipse/paho.mqtt.golang v1.5.0
 	github.com/go-co-op/gocron/v2 v2.14.0
+	github.com/go-playground/validator/v10 v10.23.0
 	github.com/goccy/go-yaml v1.15.12
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510
 	github.com/rs/zerolog v1.33.0
@@ -17,10 +18,14 @@ require (
 
 require (
 	github.com/ebitengine/purego v0.8.1 // indirect
+	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
 	github.com/go-ole/go-ole v1.3.0 // indirect
+	github.com/go-playground/locales v0.14.1 // indirect
+	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/jonboulle/clockwork v0.4.0 // indirect
+	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/lufia/plan9stats v0.0.0-20240909124753-873cd0166683 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
@@ -29,6 +34,7 @@ require (
 	github.com/tklauser/go-sysconf v0.3.14 // indirect
 	github.com/tklauser/numcpus v0.9.0 // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
+	golang.org/x/crypto v0.31.0 // indirect
 	golang.org/x/exp v0.0.0-20241217172543-b2144cdd0a67 // indirect
 	golang.org/x/net v0.33.0 // indirect
 	golang.org/x/sync v0.10.0 // indirect
