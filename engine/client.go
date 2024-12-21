@@ -57,7 +57,7 @@ func SetupMQTT(onConn mqtt.OnConnectHandler) func() {
 	// create client options
 	opts := mqtt.NewClientOptions().
 		AddBroker(url).
-		SetClientID("system-bridge").
+		SetClientID("system-bridge-" + config.Config.HostID).
 		SetUsername(config.Config.MQTT.Username).
 		SetPassword(config.Config.MQTT.Password).
 		SetConnectRetry(true).

@@ -20,7 +20,9 @@ var (
 )
 
 type CoreConfig struct {
-	MQTT struct {
+	HostID     string `yaml:"host_id"`
+	DeviceName string `yaml:"device_name"`
+	MQTT       struct {
 		Host           string `yaml:"host" validate:"required,hostname|ip"`
 		Port           string `yaml:"port" validate:"required,numeric"`
 		TLS            bool   `yaml:"tls"`
@@ -34,7 +36,7 @@ type CoreConfig struct {
 }
 
 func (c *CoreConfig) AvailabilityTopic() string {
-	return path.Join(Config.MQTT.BaseTopic, HostID, "availability")
+	return path.Join(Config.MQTT.BaseTopic, Config.HostID, "availability")
 }
 
 func Path() string {
@@ -64,6 +66,9 @@ func LoadConfig() {
 		fmt.Println(yaml.FormatError(err, true, true))
 		log.Fatal().Msg("fatal error parsing config")
 	}
+
+	// load device config
+	loadDeviceConfig()
 
 	log.Info().Msg("config loaded")
 }

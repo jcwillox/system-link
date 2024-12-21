@@ -7,7 +7,6 @@ import (
 )
 
 var Device DeviceConfig
-var HostID string
 
 type DeviceConfig struct {
 	ConfigurationURL string   `json:"configuration_url,omitempty"`
@@ -19,18 +18,24 @@ type DeviceConfig struct {
 	HwVersion        string   `json:"hw_version,omitempty"`
 }
 
-func SetupDeviceConfig() {
+func loadDeviceConfig() {
 	info, err := host.Info()
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed to get host info")
 	}
 
+	if Config.HostID == "" {
+		Config.HostID = info.HostID
+	}
+	if Config.DeviceName == "" {
+		Config.DeviceName = info.Hostname
+	}
+
 	hwVersion, _, _ := strings.Cut(info.PlatformVersion, " Build ")
 
-	HostID = info.HostID
 	Device = DeviceConfig{
-		Identifiers:  []string{"system-bridge", info.HostID},
-		Name:         info.Hostname,
+		Identifiers:  []string{"system-bridge", Config.HostID},
+		Name:         Config.DeviceName,
 		Manufacturer: info.OS,
 		Model:        info.Platform,
 		SwVersion:    Version,

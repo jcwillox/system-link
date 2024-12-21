@@ -21,7 +21,6 @@ func main() {
 	config.SetupLogging()
 	config.LoadConfig()
 	config.SetLogLevels()
-	config.SetupDeviceConfig()
 	entities := engine.LoadEntities()
 
 	// perform cleanup

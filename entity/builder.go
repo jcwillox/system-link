@@ -85,7 +85,7 @@ func (e *BuildConfig) DefaultStateTopic() *BuildConfig {
 				Str("object", e.objectID).Msg("component type and object id must be set for state topic")
 		}
 
-		e.stateTopic = path.Join(config.Config.MQTT.BaseTopic, e.componentType.String(), config.HostID, e.objectID, "state")
+		e.stateTopic = path.Join(config.Config.MQTT.BaseTopic, e.componentType.String(), config.Config.HostID, e.objectID, "state")
 	}
 	return e
 }
@@ -97,7 +97,7 @@ func (e *BuildConfig) DefaultCommandTopic() *BuildConfig {
 				Str("object", e.objectID).Msg("component type and object id must be set for command topic")
 		}
 
-		e.commandTopic = path.Join(config.Config.MQTT.BaseTopic, e.componentType.String(), config.HostID, e.objectID, "set")
+		e.commandTopic = path.Join(config.Config.MQTT.BaseTopic, e.componentType.String(), config.Config.HostID, e.objectID, "set")
 	}
 	return e
 }
@@ -115,7 +115,7 @@ func (e *BuildConfig) ID(id string) *BuildConfig {
 		e.objectID = id
 	}
 	if e.Config.UniqueID == "" {
-		e.Config.UniqueID = fmt.Sprintf("%s_%s_%s", config.HostID, id, "system-bridge")
+		e.Config.UniqueID = fmt.Sprintf("%s_%s_%s", config.Config.HostID, id, "system-bridge")
 	}
 	return e
 }
@@ -323,7 +323,7 @@ func NewEntity(cfg Config) *BuildConfig {
 
 			log.Info().Interface("config", discoveryConfig).Msg("discovery config")
 
-			configTopic := path.Join(config.Config.MQTT.DiscoveryTopic, e.config.componentType.String(), config.HostID, e.config.objectID, "config")
+			configTopic := path.Join(config.Config.MQTT.DiscoveryTopic, e.config.componentType.String(), config.Config.HostID, e.config.objectID, "config")
 			token := client.Publish(configTopic, 0, true, data)
 			if token.Wait() && token.Error() != nil {
 				log.Err(token.Error()).Str("name", e.Name()).Msg("failed publishing config")
