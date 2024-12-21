@@ -24,16 +24,12 @@ func Update() error {
 	log.Debug().Str("download_url", downloadUrl).Msg("downloading update")
 
 	// get executable directory (working directory)
-	exePath, exeDir, _, err := utils.ExecutablePaths()
-	if err != nil {
-		return err
-	}
-	log.Debug().Str("dir", exeDir).Msg("executable directory")
+	log.Debug().Str("dir", utils.ExeDirectory).Msg("executable directory")
 
 	// download file
-	archivePath := filepath.Join(exeDir, "update.tar.gz")
+	archivePath := filepath.Join(utils.ExeDirectory, "update.tar.gz")
 	if runtime.GOOS == "windows" {
-		archivePath = filepath.Join(exeDir, "update.zip")
+		archivePath = filepath.Join(utils.ExeDirectory, "update.zip")
 	}
 
 	err = downloadFile(downloadUrl, archivePath)
@@ -43,7 +39,7 @@ func Update() error {
 	log.Info().Str("latest_version", latestVersion).Msg("update downloaded")
 
 	// extract file
-	outputPath := exePath + ".new"
+	outputPath := utils.ExePath + ".new"
 	if runtime.GOOS == "windows" {
 		err = extractZip(archivePath, outputPath)
 		if err != nil {
@@ -67,25 +63,25 @@ func Update() error {
 	}
 
 	// rename current executable to old
-	err = os.Rename(exePath, exePath+".old")
+	err = os.Rename(utils.ExePath, utils.ExePath+".old")
 	if err != nil {
 		return fmt.Errorf("failed to rename executable to '.old': %w", err)
 	}
 
 	// rename new executable to current
-	err = os.Rename(outputPath, exePath)
+	err = os.Rename(outputPath, utils.ExePath)
 	if err != nil {
 		return fmt.Errorf("failed to rename executable to '.new': %w", err)
 	}
 
 	// delete old executable
 	// ignore error as it will fail on windows as executable is still running
-	_ = os.Remove(exePath + ".old")
+	_ = os.Remove(utils.ExePath + ".old")
 
 	log.Info().Msg("restarting system-bridge for update")
 
 	if runtime.GOOS == "windows" {
-		_, err := os.StartProcess(exePath, os.Args, &os.ProcAttr{
+		_, err := os.StartProcess(utils.ExePath, os.Args, &os.ProcAttr{
 			Files: []*os.File{os.Stdin, os.Stdout, os.Stderr},
 		})
 		if err != nil {
@@ -96,7 +92,7 @@ func Update() error {
 	} else {
 		// exec is preferred over StartProcess as it will replace the current process,
 		// but it is not available on windows
-		err := syscall.Exec(exePath, os.Args, os.Environ())
+		err := syscall.Exec(utils.ExePath, os.Args, os.Environ())
 		if err != nil {
 			log.Err(err).Msg("failed to automatically restart system-bridge")
 			return err
@@ -107,9 +103,5 @@ func Update() error {
 }
 
 func Cleanup() {
-	exePath, _, _, err := utils.ExecutablePaths()
-	if err != nil {
-		log.Fatal().Err(err).Msg("failed to get executable path")
-	}
-	_ = os.Remove(exePath + ".old")
+	_ = os.Remove(utils.ExePath + ".old")
 }

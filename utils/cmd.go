@@ -46,19 +46,15 @@ func getShell(shell string) []string {
 }
 
 func renderTemplate(command string) (string, error) {
-	exePath, exeDir, exeName, err := ExecutablePaths()
-	if err != nil {
-		return "", err
-	}
 	parse, err := template.New("command").Parse(command)
 	if err != nil {
 		return "", fmt.Errorf("failed to parse template command: %s; %w", command, err)
 	}
 	var tpl bytes.Buffer
 	err = parse.Execute(&tpl, map[string]interface{}{
-		"exePath": exePath,
-		"exeDir":  exeDir,
-		"exeName": exeName,
+		"ExePath":      ExePath,
+		"ExeDirectory": ExeDirectory,
+		"ExeName":      ExeName,
 	})
 	if err != nil {
 		return "", fmt.Errorf("failed to render template command: %s; %w", command, err)

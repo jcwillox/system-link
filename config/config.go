@@ -4,9 +4,11 @@ import (
 	"fmt"
 	"github.com/creasty/defaults"
 	"github.com/goccy/go-yaml"
+	"github.com/jcwillox/system-bridge/utils"
 	"github.com/rs/zerolog/log"
 	"os"
 	"path"
+	"path/filepath"
 )
 
 var (
@@ -34,6 +36,13 @@ func (c *CoreConfig) AvailabilityTopic() string {
 	return path.Join(Config.MQTT.BaseTopic, HostID, "availability")
 }
 
+func Path() string {
+	if env := os.Getenv("SYSTEM_BRIDGE_CONFIG"); env != "" {
+		return env
+	}
+	return filepath.Join(utils.ExeDirectory, "config.yaml")
+}
+
 func LoadConfig() {
 	// set defaults
 	err := defaults.Set(&Config)
@@ -42,7 +51,7 @@ func LoadConfig() {
 	}
 
 	// load config
-	data, err := os.ReadFile("config.yaml")
+	data, err := os.ReadFile(Path())
 	if err != nil {
 		log.Fatal().Err(err).Msg("fatal error reading config")
 	}

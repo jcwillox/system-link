@@ -13,12 +13,8 @@ type InstanceLock struct {
 	lockFile string
 }
 
-func NewInstanceLock() (InstanceLock, error) {
-	exePath, err := os.Executable()
-	if err != nil {
-		return InstanceLock{}, err
-	}
-	return InstanceLock{lockFile: filepath.Join(exePath + ".lock")}, nil
+func NewInstanceLock() InstanceLock {
+	return InstanceLock{lockFile: filepath.Join(ExePath + ".lock")}
 }
 
 // Lock writes the current process id to the lock file
@@ -81,13 +77,9 @@ func (l InstanceLock) KillLockedPid() error {
 }
 
 func LockAndKill() *InstanceLock {
-	instanceLock, err := NewInstanceLock()
-	if err != nil {
-		log.Fatal().Err(err).Msg("failed to create instance lock")
-		return nil
-	}
+	instanceLock := NewInstanceLock()
 
-	err = instanceLock.KillLockedPid()
+	err := instanceLock.KillLockedPid()
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed to kill locked pid")
 		return nil

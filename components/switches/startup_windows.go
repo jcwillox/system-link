@@ -6,24 +6,19 @@ import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/go-co-op/gocron/v2"
 	"github.com/jcwillox/system-bridge/entity"
+	"github.com/jcwillox/system-bridge/utils"
 	"github.com/rs/zerolog/log"
 	"golang.org/x/sys/windows/registry"
-	"os"
 )
 
 func createStartupEntry() error {
-	exePath, err := os.Executable()
-	if err != nil {
-		return err
-	}
-
 	key, _, err := registry.CreateKey(registry.CURRENT_USER, `Software\Microsoft\Windows\CurrentVersion\Run`, registry.SET_VALUE)
 	if err != nil {
 		return err
 	}
 	defer key.Close()
 
-	return key.SetStringValue("SystemBridge", exePath)
+	return key.SetStringValue("SystemBridge", utils.ExePath)
 }
 
 func deleteStartupEntry() error {
@@ -37,11 +32,6 @@ func deleteStartupEntry() error {
 }
 
 func hasStartupEntry() (bool, error) {
-	exePath, err := os.Executable()
-	if err != nil {
-		return false, err
-	}
-
 	key, err := registry.OpenKey(registry.CURRENT_USER, `Software\Microsoft\Windows\CurrentVersion\Run`, registry.QUERY_VALUE)
 	if err != nil {
 		return false, err
@@ -53,7 +43,7 @@ func hasStartupEntry() (bool, error) {
 		return false, nil
 	}
 
-	if startupPath != exePath {
+	if startupPath != utils.ExePath {
 		return false, nil
 	}
 

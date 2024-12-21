@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"github.com/jcwillox/system-bridge/utils"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"gopkg.in/natefinch/lumberjack.v2"
@@ -27,7 +28,7 @@ func SetupLogging() {
 
 	fileWriter := zerolog.ConsoleWriter{
 		Out: &lumberjack.Logger{
-			Filename:   "system-bridge.log",
+			Filename:   strings.TrimSuffix(utils.ExePath, ".exe") + ".log",
 			MaxSize:    1,
 			MaxBackups: 3,
 		},

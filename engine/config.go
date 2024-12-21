@@ -8,6 +8,7 @@ import (
 	"github.com/jcwillox/system-bridge/components/sensors"
 	"github.com/jcwillox/system-bridge/components/switches"
 	"github.com/jcwillox/system-bridge/components/updaters"
+	"github.com/jcwillox/system-bridge/config"
 	"github.com/jcwillox/system-bridge/entity"
 	"github.com/rs/zerolog/log"
 	"os"
@@ -24,20 +25,20 @@ type EntitiesConfig struct {
 func (c *EntitiesConfig) LoadEntities() []*entity.Entity {
 	var entities []*entity.Entity
 
-	for _, config := range c.Buttons {
-		entities = append(entities, config.LoadEntities()...)
+	for _, cfg := range c.Buttons {
+		entities = append(entities, cfg.LoadEntities()...)
 	}
-	for _, config := range c.Sensors {
-		entities = append(entities, config.LoadEntities()...)
+	for _, cfg := range c.Sensors {
+		entities = append(entities, cfg.LoadEntities()...)
 	}
-	for _, config := range c.BinarySensors {
-		entities = append(entities, config.LoadEntities()...)
+	for _, cfg := range c.BinarySensors {
+		entities = append(entities, cfg.LoadEntities()...)
 	}
-	for _, config := range c.Switches {
-		entities = append(entities, config.LoadEntities()...)
+	for _, cfg := range c.Switches {
+		entities = append(entities, cfg.LoadEntities()...)
 	}
-	for _, config := range c.Updaters {
-		entities = append(entities, config.LoadEntities()...)
+	for _, cfg := range c.Updaters {
+		entities = append(entities, cfg.LoadEntities()...)
 	}
 
 	return entities
@@ -47,8 +48,8 @@ type Config struct {
 	Entities EntitiesConfig `yaml:"entities"`
 }
 
-func LoadEntitiesConfig() EntitiesConfig {
-	data, err := os.ReadFile("config.yaml")
+func LoadEntities() []*entity.Entity {
+	data, err := os.ReadFile(config.Path())
 	if err != nil {
 		log.Fatal().Err(err).Msg("fatal error reading entities config")
 	}
@@ -59,10 +60,5 @@ func LoadEntitiesConfig() EntitiesConfig {
 		log.Fatal().Msg("fatal error parsing entities config")
 	}
 
-	return cfg.Entities
-}
-
-func LoadEntities() []*entity.Entity {
-	config := LoadEntitiesConfig()
-	return config.LoadEntities()
+	return cfg.Entities.LoadEntities()
 }
