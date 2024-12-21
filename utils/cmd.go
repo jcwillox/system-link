@@ -2,6 +2,7 @@ package utils
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"github.com/google/shlex"
 	"github.com/rs/zerolog/log"
@@ -12,9 +13,10 @@ import (
 )
 
 type CommandConfig struct {
-	Command string `json:"command"`
-	Hidden  *bool  `json:"hidden"`
-	Shell   string `json:"shell"`
+	Command    string `json:"command" validate:"required"`
+	Hidden     *bool  `json:"hidden"`
+	Shell      string `json:"shell"`
+	ShowErrors bool   `json:"show_errors"`
 }
 
 func GetDefaultShell() []string {
@@ -62,7 +64,7 @@ func renderTemplate(command string) (string, error) {
 	return tpl.String(), nil
 }
 
-func RunCommand(command string, shell string, hidden *bool) error {
+func RunCommand(command string, shell string, hidden *bool, showErrors bool) error {
 	var args []string
 	var err error
 
@@ -95,5 +97,13 @@ func RunCommand(command string, shell string, hidden *bool) error {
 		}
 	}
 
-	return cmd.Run()
+	output, err := cmd.CombinedOutput()
+	var exitErr *execabs.ExitError
+	if errors.As(err, &exitErr) {
+		if showErrors {
+			log.Err(err).Int("exit", exitErr.ExitCode()).Str("output", string(output)).Msg("command failed")
+		}
+		return nil
+	}
+	return err
 }

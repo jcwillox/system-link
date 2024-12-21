@@ -17,6 +17,9 @@ func (c *Config) LoadEntities() []*entity.Entity {
 			entities = append(entities, e)
 		}
 	}
+	if c.Cron != nil {
+		entities = append(entities, NewCron(*c.Cron))
+	}
 
 	return entities
 }
