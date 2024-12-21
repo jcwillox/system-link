@@ -12,3 +12,28 @@ type Config struct {
 	Reload   *entity.Config `yaml:"reload,omitempty"`
 	Exit     *entity.Config `yaml:"exit,omitempty"`
 }
+
+func (c *Config) LoadEntities() []*entity.Entity {
+	var entities []*entity.Entity
+
+	if c.Custom != nil {
+		entities = append(entities, NewCustom(*c.Custom))
+	}
+	if c.Lock != nil {
+		entities = append(entities, NewLock(*c.Lock))
+	}
+	if c.Shutdown != nil {
+		entities = append(entities, NewShutdown(*c.Shutdown))
+	}
+	if c.Sleep != nil {
+		entities = append(entities, NewSleep(*c.Sleep))
+	}
+	if c.Reload != nil {
+		entities = append(entities, NewReload(*c.Reload))
+	}
+	if c.Exit != nil {
+		entities = append(entities, NewExit(*c.Exit))
+	}
+
+	return entities
+}
