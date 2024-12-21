@@ -5,14 +5,10 @@ import (
 	"path/filepath"
 )
 
-func ExecutablePaths() (string, string, error) {
+func ExecutablePaths() (string, string, string, error) {
 	path, err := os.Executable()
 	if err != nil {
-		return "", "", err
+		return "", "", "", err
 	}
-	path, err = filepath.Abs(path)
-	if err != nil {
-		return "", "", err
-	}
-	return path, filepath.Dir(path), nil
+	return path, filepath.Dir(path), filepath.Base(path), nil
 }

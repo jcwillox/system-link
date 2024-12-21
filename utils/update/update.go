@@ -24,7 +24,7 @@ func Update() error {
 	log.Debug().Str("download_url", downloadUrl).Msg("downloading update")
 
 	// get executable directory (working directory)
-	exePath, exeDir, err := utils.ExecutablePaths()
+	exePath, exeDir, _, err := utils.ExecutablePaths()
 	if err != nil {
 		return err
 	}
@@ -107,7 +107,7 @@ func Update() error {
 }
 
 func Cleanup() {
-	exePath, _, err := utils.ExecutablePaths()
+	exePath, _, _, err := utils.ExecutablePaths()
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed to get executable path")
 	}
