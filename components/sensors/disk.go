@@ -9,8 +9,8 @@ import (
 )
 
 type DiskConfig struct {
-	Mountpoint string `json:"mountpoint"`
-	entity.Config
+	Mountpoint    string `json:"mountpoint"`
+	entity.Config `yaml:",inline"`
 }
 
 func NewDisk(cfg DiskConfig) *entity.Entity {

@@ -1,13 +1,15 @@
 package engine
 
 import (
-	"github.com/ilyakaznacheev/cleanenv"
+	"fmt"
+	"github.com/goccy/go-yaml"
 	"github.com/jcwillox/system-bridge/components/binary_sensors"
 	"github.com/jcwillox/system-bridge/components/buttons"
 	"github.com/jcwillox/system-bridge/components/sensors"
 	"github.com/jcwillox/system-bridge/components/switches"
 	"github.com/jcwillox/system-bridge/components/updaters"
 	"github.com/rs/zerolog/log"
+	"os"
 )
 
 type EntitiesConfig struct {
@@ -23,11 +25,16 @@ type Config struct {
 }
 
 func LoadEntitiesConfig() EntitiesConfig {
-	cfg := Config{}
-	// read config
-	err := cleanenv.ReadConfig("config.yaml", &cfg)
+	data, err := os.ReadFile("config.yaml")
 	if err != nil {
 		log.Fatal().Err(err).Msg("fatal error reading entities config")
 	}
+
+	cfg := Config{}
+	if err = yaml.Unmarshal(data, &cfg); err != nil {
+		fmt.Println(yaml.FormatError(err, true, true))
+		log.Fatal().Msg("fatal error parsing entities config")
+	}
+
 	return cfg.Entities
 }

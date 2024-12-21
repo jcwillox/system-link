@@ -6,7 +6,6 @@ import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/go-co-op/gocron/v2"
 	"github.com/jcwillox/system-bridge/config"
-	"github.com/jcwillox/system-bridge/utils"
 	"github.com/rs/zerolog/log"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
@@ -56,7 +55,7 @@ type Config struct {
 	DeviceClass string `json:"device_class,omitempty"`
 
 	//Filters        engine.Filters `json:"filters,omitempty"`
-	UpdateInterval utils.Duration `yaml:"update_interval"`
+	UpdateInterval time.Duration `yaml:"update_interval"`
 
 	PayloadOn      string `json:"payload_on,omitempty"`
 	PayloadOff     string `json:"payload_off,omitempty"`
@@ -209,7 +208,7 @@ func (e *BuildConfig) DisableAvailability() *BuildConfig {
 
 func (e *BuildConfig) Interval(interval time.Duration) *BuildConfig {
 	if e.Config.UpdateInterval == 0 {
-		e.Config.UpdateInterval = utils.Duration(interval)
+		e.Config.UpdateInterval = interval
 	}
 	return e
 }
