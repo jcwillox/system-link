@@ -34,5 +34,5 @@ func NewScreen(cfg entity.Config) *entity.Entity {
 			}
 
 			return e.PublishRawState(client, buff.Bytes())
-		}).DisableAvailability().Build()
+		}).Build()
 }

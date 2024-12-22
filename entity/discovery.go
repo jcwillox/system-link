@@ -65,7 +65,7 @@ func (e *Entity) DiscoveryConfig() DiscoveryConfig {
 		discoveryConfig.ImageTopic = discoveryConfig.StateTopic
 		discoveryConfig.StateTopic = ""
 	}
-	if e.AvailabilityEnabled() {
+	if e.config.Availability == nil || *e.config.Availability {
 		discoveryConfig.Availability = []AvailabilityItem{{Topic: config.Config.AvailabilityTopic()}}
 	}
 	return discoveryConfig

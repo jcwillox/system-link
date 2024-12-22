@@ -62,6 +62,9 @@ type Config struct {
 	PayloadOn      string `json:"payload_on,omitempty"`
 	PayloadOff     string `json:"payload_off,omitempty"`
 	PayloadInstall string `json:"payload_install,omitempty"`
+
+	// set too false to disable availability
+	Availability *bool `json:"availability,omitempty"`
 }
 
 type BuildConfig struct {
@@ -74,8 +77,7 @@ type BuildConfig struct {
 	stateTopic   string
 	commandTopic string
 
-	disableAvailability bool
-	runScheduleAtStart  bool
+	runScheduleAtStart bool
 
 	Config
 }
@@ -199,12 +201,18 @@ func (e *BuildConfig) DisabledByDefault() *BuildConfig {
 }
 
 func (e *BuildConfig) EnableAvailability() *BuildConfig {
-	e.disableAvailability = false
+	if e.Config.Availability == nil {
+		e.Config.Availability = new(bool)
+		*e.Config.Availability = true
+	}
 	return e
 }
 
 func (e *BuildConfig) DisableAvailability() *BuildConfig {
-	e.disableAvailability = true
+	if e.Config.Availability == nil {
+		e.Config.Availability = new(bool)
+		*e.Config.Availability = false
+	}
 	return e
 }
 
