@@ -25,7 +25,7 @@ func NewCron(cfg CronConfig) *entity.Entity {
 	jobTask := gocron.NewTask(func() {
 		log.Debug().Str("command", cfg.CommandConfig.Command).Msg("running command task")
 		// run command
-		err := utils.RunCommand(cfg.Command, cfg.Shell, cfg.Hidden, cfg.ShowErrors)
+		err := utils.RunCommand(cfg.Command, cfg.Shell, cfg.Hidden, cfg.ShowErrors, cfg.Detached)
 		if err != nil {
 			log.Err(err).Str("command", cfg.CommandConfig.Command).Msg("failed to run command")
 		}

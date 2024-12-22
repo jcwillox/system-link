@@ -25,6 +25,7 @@ type DiscoveryConfig struct {
 	DeviceClass string `json:"device_class,omitempty"`
 
 	StateTopic   string `json:"state_topic,omitempty"`
+	ImageTopic   string `json:"image_topic,omitempty"`
 	CommandTopic string `json:"command_topic,omitempty"`
 
 	PayloadOn      string `json:"payload_on,omitempty"`
@@ -59,6 +60,10 @@ func (e *Entity) DiscoveryConfig() DiscoveryConfig {
 		PayloadOff:                e.PayloadOff(),
 		PayloadInstall:            e.PayloadInstall(),
 		Device:                    config.Device,
+	}
+	if e.config.componentType == DomainImage {
+		discoveryConfig.ImageTopic = discoveryConfig.StateTopic
+		discoveryConfig.StateTopic = ""
 	}
 	if e.AvailabilityEnabled() {
 		discoveryConfig.Availability = []AvailabilityItem{{Topic: config.Config.AvailabilityTopic()}}

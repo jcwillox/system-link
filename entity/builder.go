@@ -30,6 +30,8 @@ var (
 	DomainSensor       = Domain{"sensor"}
 	DomainSwitch       = Domain{"switch"}
 	DomainUpdate       = Domain{"update"}
+	DomainLock         = Domain{"lock"}
+	DomainImage        = Domain{"image"}
 )
 
 type Config struct {

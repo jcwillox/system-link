@@ -18,7 +18,7 @@ func NewCustom(cfg CustomConfig) *entity.Entity {
 		Type(entity.DomainButton).
 		ObjectID(cfg.UniqueID).
 		OnCommand(func(entity *entity.Entity, client mqtt.Client, scheduler gocron.Scheduler, message mqtt.Message) {
-			err := utils.RunCommand(cfg.Command, cfg.Shell, cfg.Hidden, cfg.ShowErrors)
+			err := utils.RunCommand(cfg.Command, cfg.Shell, cfg.Hidden, cfg.ShowErrors, cfg.Detached)
 			if err != nil {
 				log.Err(err).Str("command", cfg.CommandConfig.Command).Msg("failed to run command")
 			}

@@ -5,6 +5,8 @@ import (
 	"github.com/goccy/go-yaml"
 	"github.com/jcwillox/system-bridge/components/binary_sensors"
 	"github.com/jcwillox/system-bridge/components/buttons"
+	"github.com/jcwillox/system-bridge/components/images"
+	"github.com/jcwillox/system-bridge/components/locks"
 	"github.com/jcwillox/system-bridge/components/sensors"
 	"github.com/jcwillox/system-bridge/components/switches"
 	"github.com/jcwillox/system-bridge/components/updaters"
@@ -20,6 +22,8 @@ type EntitiesConfig struct {
 	BinarySensors []binary_sensors.Config `yaml:"binary_sensors"`
 	Switches      []switches.Config       `yaml:"switches"`
 	Updaters      []updaters.Config       `yaml:"updaters"`
+	Locks         []locks.Config          `yaml:"locks"`
+	Images        []images.Config         `yaml:"images"`
 }
 
 func (c *EntitiesConfig) LoadEntities() []*entity.Entity {
@@ -38,6 +42,12 @@ func (c *EntitiesConfig) LoadEntities() []*entity.Entity {
 		entities = append(entities, cfg.LoadEntities()...)
 	}
 	for _, cfg := range c.Updaters {
+		entities = append(entities, cfg.LoadEntities()...)
+	}
+	for _, cfg := range c.Locks {
+		entities = append(entities, cfg.LoadEntities()...)
+	}
+	for _, cfg := range c.Images {
 		entities = append(entities, cfg.LoadEntities()...)
 	}
 

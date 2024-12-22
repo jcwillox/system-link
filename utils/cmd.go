@@ -17,6 +17,8 @@ type CommandConfig struct {
 	Hidden     *bool  `json:"hidden"`
 	Shell      string `json:"shell"`
 	ShowErrors bool   `json:"show_errors"`
+	// Don't wait for the command to finish
+	Detached bool `json:"detached"`
 }
 
 func GetDefaultShell() []string {
@@ -64,7 +66,7 @@ func renderTemplate(command string) (string, error) {
 	return tpl.String(), nil
 }
 
-func RunCommand(command string, shell string, hidden *bool, showErrors bool) error {
+func RunCommand(command string, shell string, hidden *bool, showErrors bool, detached bool) error {
 	var args []string
 	var err error
 
@@ -95,6 +97,17 @@ func RunCommand(command string, shell string, hidden *bool, showErrors bool) err
 		cmd.SysProcAttr = &syscall.SysProcAttr{
 			HideWindow: true,
 		}
+	}
+
+	if detached {
+		if err := cmd.Start(); err != nil {
+			return fmt.Errorf("failed to start command: %s; %w", command, err)
+		}
+		err := cmd.Process.Release()
+		if err != nil {
+			return err
+		}
+		return nil
 	}
 
 	output, err := cmd.CombinedOutput()
