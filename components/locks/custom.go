@@ -1,7 +1,6 @@
 package locks
 
 import (
-	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/go-co-op/gocron/v2"
 	"github.com/jcwillox/system-bridge/entity"
@@ -35,6 +34,7 @@ func NewCustom(cfg CustomConfig) *entity.Entity {
 		})
 	if cfg.Optimistic {
 		builder.Optimistic().
+			Retain().
 			PayloadLock("LOCKED").
 			PayloadUnlock("UNLOCKED").
 			DisableAvailability()

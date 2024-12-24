@@ -67,6 +67,7 @@ type Config struct {
 
 	// set too false to disable availability
 	Availability *bool `json:"availability,omitempty"`
+	Retain       *bool `json:"retain,omitempty"`
 }
 
 type BuildConfig struct {
@@ -337,6 +338,14 @@ func (e *BuildConfig) RunAtStart() *BuildConfig {
 func (e *BuildConfig) Optimistic() *BuildConfig {
 	//e.DefaultStateTopic()
 	e.commandTopic = e.stateTopic
+	return e
+}
+
+func (e *BuildConfig) Retain() *BuildConfig {
+	if e.Config.Retain == nil {
+		e.Config.Retain = new(bool)
+		*e.Config.Retain = true
+	}
 	return e
 }
 

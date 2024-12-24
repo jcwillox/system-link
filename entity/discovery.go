@@ -36,6 +36,7 @@ type DiscoveryConfig struct {
 
 	Availability []AvailabilityItem  `json:"availability,omitempty"`
 	Device       config.DeviceConfig `json:"device,omitempty"`
+	Retain       *bool               `json:"retain,omitempty"`
 }
 
 type AvailabilityItem struct {
@@ -63,6 +64,7 @@ func (e *Entity) DiscoveryConfig() DiscoveryConfig {
 		PayloadInstall:            e.PayloadInstall(),
 		PayloadLock:               e.PayloadLock(),
 		PayloadUnlock:             e.PayloadUnlock(),
+		Retain:                    e.config.Config.Retain,
 		Device:                    config.Device,
 	}
 	if e.config.componentType == DomainImage {
