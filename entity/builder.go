@@ -72,7 +72,7 @@ type Config struct {
 
 type BuildConfig struct {
 	setupFns   []SetupFn
-	cleanupFns []func()
+	cleanupFns []SetupFn
 
 	componentType Domain
 	objectID      string
@@ -252,7 +252,7 @@ func (e *BuildConfig) OnSetup(setupFn SetupFn) *BuildConfig {
 	return e
 }
 
-func (e *BuildConfig) OnCleanup(cleanup func()) *BuildConfig {
+func (e *BuildConfig) OnCleanup(cleanup SetupFn) *BuildConfig {
 	e.cleanupFns = append(e.cleanupFns, cleanup)
 	return e
 }
@@ -268,8 +268,9 @@ func (e *BuildConfig) OnCommand(handler MessageFn) *BuildConfig {
 			log.Info().Str("name", e.Config.Name).Msg("subscribed to command topic")
 		}
 
-		e.OnCleanup(func() {
+		e.OnCleanup(func(entity *Entity, client mqtt.Client, scheduler gocron.Scheduler) error {
 			client.Unsubscribe(e.commandTopic)
+			return nil
 		})
 
 		return nil
@@ -288,8 +289,9 @@ func (e *BuildConfig) OnState(handler MessageFn) *BuildConfig {
 			log.Info().Str("name", e.Config.Name).Msg("subscribed to state topic")
 		}
 
-		e.OnCleanup(func() {
+		e.OnCleanup(func(entity *Entity, client mqtt.Client, scheduler gocron.Scheduler) error {
 			client.Unsubscribe(e.stateTopic)
+			return nil
 		})
 
 		return nil
@@ -299,7 +301,7 @@ func (e *BuildConfig) OnState(handler MessageFn) *BuildConfig {
 
 func (e *BuildConfig) Schedule(handler SetupFn) *BuildConfig {
 	e.DefaultStateTopic().OnSetup(func(entity *Entity, client mqtt.Client, scheduler gocron.Scheduler) error {
-		log.Info().Str("name", e.Config.Name).Dur("interval", time.Duration(e.UpdateInterval)).Msg("scheduling update")
+		log.Info().Str("name", e.Config.Name).Dur("interval", e.UpdateInterval).Msg("scheduling update")
 
 		var options []gocron.JobOption
 
@@ -307,7 +309,7 @@ func (e *BuildConfig) Schedule(handler SetupFn) *BuildConfig {
 			options = append(options, gocron.WithStartAt(gocron.WithStartImmediately()))
 		}
 
-		job, err := scheduler.NewJob(gocron.DurationJob(time.Duration(e.UpdateInterval)), gocron.NewTask(func() {
+		job, err := scheduler.NewJob(gocron.DurationJob(e.UpdateInterval), gocron.NewTask(func() {
 			err := handler(entity, client, scheduler)
 			if err != nil {
 				log.Err(err).Str("name", e.Config.Name).Msg("failed to update")
@@ -318,11 +320,12 @@ func (e *BuildConfig) Schedule(handler SetupFn) *BuildConfig {
 			log.Err(err).Str("name", e.Config.Name).Msg("failed to schedule update")
 		}
 
-		e.OnCleanup(func() {
+		e.OnCleanup(func(entity *Entity, client mqtt.Client, scheduler gocron.Scheduler) error {
 			err := scheduler.RemoveJob(job.ID())
 			if err != nil {
 				log.Err(err).Str("name", e.Config.Name).Msg("failed to remove job")
 			}
+			return nil
 		})
 
 		return nil

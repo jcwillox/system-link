@@ -35,7 +35,7 @@ func (e *Entity) PublishRawState(client mqtt.Client, state interface{}) error {
 	return nil
 }
 
-func (e *Entity) OnCleanup(fn func()) *Entity {
+func (e *Entity) OnCleanup(fn SetupFn) *Entity {
 	e.config.OnCleanup(fn)
 	return e
 }
@@ -114,10 +114,13 @@ func SetupAll(entities []*Entity, client mqtt.Client, scheduler gocron.Scheduler
 	return nil
 }
 
-func CleanupAll(entities []*Entity) {
+func CleanupAll(entities []*Entity, client mqtt.Client, scheduler gocron.Scheduler) {
 	for _, entity := range entities {
 		for _, fn := range entity.config.cleanupFns {
-			fn()
+			err := fn(entity, client, scheduler)
+			if err != nil {
+				log.Err(err).Msg("failed to cleanup entity")
+			}
 		}
 	}
 }

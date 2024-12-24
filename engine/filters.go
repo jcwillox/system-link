@@ -62,7 +62,7 @@ func (f Filters) filter(state interface{}) (interface{}, error) {
 func (f Filters) throttle(state interface{}) (interface{}, error) {
 	if f.Throttle > 0 {
 		// check if throttle has passed
-		if time.Since(f.state.LastUpdated) < time.Duration(f.Throttle) {
+		if time.Since(f.state.LastUpdated) < f.Throttle {
 			return nil, nil
 		}
 	}

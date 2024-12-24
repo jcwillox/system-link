@@ -36,7 +36,7 @@ func main() {
 
 	// setup mqtt
 	disconnect := engine.SetupMQTT(func(client mqtt.Client) {
-		entity.CleanupAll(entities)
+		entity.CleanupAll(entities, client, scheduler)
 		err := entity.SetupAll(entities, client, scheduler)
 		if err != nil {
 			log.Err(err).Msg("failed to setup entities")

@@ -67,10 +67,8 @@ func NewCron(cfg CronConfig) *entity.Entity {
 				_ = entity.PublishState(client, "OFF")
 			}
 		}).
-		OnSetup(func(entity *entity.Entity, client mqtt.Client, scheduler gocron.Scheduler) error {
-			entity.OnCleanup(func() {
-				removeJob(scheduler)
-			})
+		OnCleanup(func(entity *entity.Entity, client mqtt.Client, scheduler gocron.Scheduler) error {
+			removeJob(scheduler)
 			return nil
 		}).Build()
 }
