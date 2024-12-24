@@ -62,6 +62,8 @@ type Config struct {
 	PayloadOn      string `json:"payload_on,omitempty"`
 	PayloadOff     string `json:"payload_off,omitempty"`
 	PayloadInstall string `json:"payload_install,omitempty"`
+	PayloadLock    string `json:"payload_lock,omitempty"`
+	PayloadUnlock  string `json:"payload_unlock,omitempty"`
 
 	// set too false to disable availability
 	Availability *bool `json:"availability,omitempty"`
@@ -232,6 +234,16 @@ func (e *BuildConfig) PayloadOff(payload string) *BuildConfig {
 	return e
 }
 
+func (e *BuildConfig) PayloadLock(payload string) *BuildConfig {
+	e.Config.PayloadLock = payload
+	return e
+}
+
+func (e *BuildConfig) PayloadUnlock(payload string) *BuildConfig {
+	e.Config.PayloadUnlock = payload
+	return e
+}
+
 /* EVENT HANDLERS */
 
 func (e *BuildConfig) OnSetup(setupFn SetupFn) *BuildConfig {
@@ -319,6 +331,12 @@ func (e *BuildConfig) Schedule(handler SetupFn) *BuildConfig {
 
 func (e *BuildConfig) RunAtStart() *BuildConfig {
 	e.runScheduleAtStart = true
+	return e
+}
+
+func (e *BuildConfig) Optimistic() *BuildConfig {
+	//e.DefaultStateTopic()
+	e.commandTopic = e.stateTopic
 	return e
 }
 

@@ -93,6 +93,12 @@ func (e *Entity) PayloadOff() string {
 func (e *Entity) PayloadInstall() string {
 	return e.config.Config.PayloadInstall
 }
+func (e *Entity) PayloadLock() string {
+	return e.config.Config.PayloadLock
+}
+func (e *Entity) PayloadUnlock() string {
+	return e.config.Config.PayloadUnlock
+}
 
 /* INTERNAL AGGREGATE FUNCTIONS */
 

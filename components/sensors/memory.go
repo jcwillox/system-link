@@ -4,7 +4,6 @@ import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/go-co-op/gocron/v2"
 	"github.com/jcwillox/system-bridge/entity"
-	"github.com/rs/zerolog/log"
 	"github.com/shirou/gopsutil/v4/mem"
 )
 
@@ -43,7 +42,6 @@ func NewMemoryUsed(cfg entity.Config) *entity.Entity {
 			if err != nil {
 				return err
 			}
-			log.Info().Uint64("used", memory.Used).Uint64("free", memory.Free).Msg("memory")
 			return e.PublishState(client, float64(memory.Used)/Gibibyte)
 		}).Build()
 }

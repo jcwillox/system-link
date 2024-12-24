@@ -31,6 +31,8 @@ type DiscoveryConfig struct {
 	PayloadOn      string `json:"payload_on,omitempty"`
 	PayloadOff     string `json:"payload_off,omitempty"`
 	PayloadInstall string `json:"payload_install,omitempty"`
+	PayloadLock    string `json:"payload_lock,omitempty"`
+	PayloadUnlock  string `json:"payload_unlock,omitempty"`
 
 	Availability []AvailabilityItem  `json:"availability,omitempty"`
 	Device       config.DeviceConfig `json:"device,omitempty"`
@@ -59,6 +61,8 @@ func (e *Entity) DiscoveryConfig() DiscoveryConfig {
 		PayloadOn:                 e.PayloadOn(),
 		PayloadOff:                e.PayloadOff(),
 		PayloadInstall:            e.PayloadInstall(),
+		PayloadLock:               e.PayloadLock(),
+		PayloadUnlock:             e.PayloadUnlock(),
 		Device:                    config.Device,
 	}
 	if e.config.componentType == DomainImage {

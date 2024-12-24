@@ -12,12 +12,12 @@ import (
 type CustomConfig struct {
 	Lock          utils.CommandConfig `yaml:"lock"`
 	Unlock        utils.CommandConfig `yaml:"unlock"`
+	Optimistic    bool                `yaml:"optimistic"`
 	entity.Config `yaml:",inline"`
 }
 
 func NewCustom(cfg CustomConfig) *entity.Entity {
-	fmt.Println(cfg)
-	return entity.NewEntity(cfg.Config).
+	builder := entity.NewEntity(cfg.Config).
 		Type(entity.DomainLock).
 		ObjectID(cfg.UniqueID).
 		OnState(func(entity *entity.Entity, client mqtt.Client, scheduler gocron.Scheduler, message mqtt.Message) {
@@ -32,12 +32,20 @@ func NewCustom(cfg CustomConfig) *entity.Entity {
 					log.Err(err).Str("command", cfg.Unlock.Command).Msg("failed to run command")
 				}
 			}
-		}).
-		OnCommand(func(e *entity.Entity, client mqtt.Client, scheduler gocron.Scheduler, message mqtt.Message) {
+		})
+	if cfg.Optimistic {
+		builder.Optimistic().
+			PayloadLock("LOCKED").
+			PayloadUnlock("UNLOCKED").
+			DisableAvailability()
+	} else {
+		builder.OnCommand(func(e *entity.Entity, client mqtt.Client, scheduler gocron.Scheduler, message mqtt.Message) {
 			if string(message.Payload()) == "LOCK" {
 				_ = e.PublishState(client, "LOCKED")
 			} else if string(message.Payload()) == "UNLOCK" {
 				_ = e.PublishState(client, "UNLOCKED")
 			}
-		}).Build()
+		})
+	}
+	return builder.Build()
 }
