@@ -2,7 +2,6 @@ package sensors
 
 import (
 	"github.com/jcwillox/system-bridge/entity"
-	"github.com/shirou/gopsutil/v4/disk"
 )
 
 type Config struct {
@@ -29,36 +28,14 @@ func (c *Config) LoadEntities() []*entity.Entity {
 	if c.CPU != nil {
 		entities = append(entities, NewCPU(*c.CPU))
 	}
-
 	if c.Disk != nil {
-		partitions, err := disk.Partitions(false)
-		if err != nil {
-			return nil
-		}
-		for _, partition := range partitions {
-			c.Disk.Mountpoint = partition.Mountpoint
-			entities = append(entities, NewDisk(*c.Disk))
-		}
+		entities = append(entities, NewDisk(*c.Disk)...)
 	}
 	if c.DiskUsed != nil {
-		partitions, err := disk.Partitions(false)
-		if err != nil {
-			return nil
-		}
-		for _, partition := range partitions {
-			c.DiskUsed.Mountpoint = partition.Mountpoint
-			entities = append(entities, NewDiskUsed(*c.DiskUsed))
-		}
+		entities = append(entities, NewDiskUsed(*c.DiskUsed)...)
 	}
 	if c.DiskFree != nil {
-		partitions, err := disk.Partitions(false)
-		if err != nil {
-			return nil
-		}
-		for _, partition := range partitions {
-			c.DiskFree.Mountpoint = partition.Mountpoint
-			entities = append(entities, NewDiskFree(*c.DiskFree))
-		}
+		entities = append(entities, NewDiskFree(*c.DiskFree)...)
 	}
 
 	if c.Memory != nil {
