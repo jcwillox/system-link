@@ -4,6 +4,7 @@ go 1.23
 
 require (
 	github.com/creasty/defaults v1.8.0
+	github.com/distatus/battery v0.11.0
 	github.com/eclipse/paho.mqtt.golang v1.5.0
 	github.com/go-co-op/gocron/v2 v2.14.0
 	github.com/go-playground/validator/v10 v10.23.0
@@ -43,4 +44,5 @@ require (
 	golang.org/x/exp v0.0.0-20241217172543-b2144cdd0a67 // indirect
 	golang.org/x/net v0.33.0 // indirect
 	golang.org/x/sync v0.10.0 // indirect
+	howett.net/plist v1.0.0 // indirect
 )

@@ -20,6 +20,9 @@ type Config struct {
 	SwapFree *entity.Config `yaml:"swap_free,omitempty"`
 
 	Uptime *entity.Config `yaml:"uptime,omitempty"`
+
+	Battery      *entity.Config `yaml:"battery,omitempty"`
+	BatteryState *entity.Config `yaml:"battery_state,omitempty"`
 }
 
 func (c *Config) LoadEntities() []*entity.Entity {
@@ -60,6 +63,17 @@ func (c *Config) LoadEntities() []*entity.Entity {
 
 	if c.Uptime != nil {
 		entities = append(entities, NewUptime(*c.Uptime))
+	}
+
+	if c.Battery != nil {
+		if e := NewBattery(*c.Battery); e != nil {
+			entities = append(entities, e)
+		}
+	}
+	if c.BatteryState != nil {
+		if e := NewBatteryState(*c.BatteryState); e != nil {
+			entities = append(entities, e)
+		}
 	}
 
 	return entities

@@ -22,7 +22,8 @@ type DiscoveryConfig struct {
 	// https://developers.home-assistant.io/docs/core/entity/sensor/#available-state-classes
 	StateClass string `json:"state_class,omitempty"`
 	// https://www.home-assistant.io/integrations/sensor/#device-class
-	DeviceClass string `json:"device_class,omitempty"`
+	DeviceClass string   `json:"device_class,omitempty"`
+	Options     []string `json:"options,omitempty"`
 
 	StateTopic   string `json:"state_topic,omitempty"`
 	ImageTopic   string `json:"image_topic,omitempty"`
@@ -65,6 +66,7 @@ func (e *Entity) DiscoveryConfig() DiscoveryConfig {
 		PayloadLock:               e.PayloadLock(),
 		PayloadUnlock:             e.PayloadUnlock(),
 		Retain:                    e.config.Config.Retain,
+		Options:                   e.config.Config.Options,
 		Device:                    config.Device,
 	}
 	if e.config.componentType == DomainImage {

@@ -10,6 +10,7 @@ import (
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 	"path"
+	"strings"
 	"time"
 )
 
@@ -55,6 +56,8 @@ type Config struct {
 
 	// https://www.home-assistant.io/integrations/sensor/#device-class
 	DeviceClass string `json:"device_class,omitempty"`
+	// https://www.home-assistant.io/integrations/sensor.mqtt/#options
+	Options []string `json:"options,omitempty"`
 
 	//Filters        engine.Filters `json:"filters,omitempty"`
 	UpdateInterval time.Duration `yaml:"update_interval"`
@@ -116,7 +119,7 @@ func (e *BuildConfig) Type(component Domain) *BuildConfig {
 
 func (e *BuildConfig) ID(id string) *BuildConfig {
 	if e.Config.Name == "" {
-		e.Config.Name = cases.Title(language.English).String(id)
+		e.Config.Name = cases.Title(language.English).String(strings.ReplaceAll(id, "_", " "))
 	}
 	if e.objectID == "" {
 		e.objectID = id
@@ -339,7 +342,6 @@ func (e *BuildConfig) RunAtStart() *BuildConfig {
 }
 
 func (e *BuildConfig) Optimistic() *BuildConfig {
-	//e.DefaultStateTopic()
 	e.commandTopic = e.stateTopic
 	return e
 }
@@ -349,6 +351,11 @@ func (e *BuildConfig) Retain() *BuildConfig {
 		e.Config.Retain = new(bool)
 		*e.Config.Retain = true
 	}
+	return e
+}
+
+func (e *BuildConfig) Options(options []string) *BuildConfig {
+	e.Config.Options = options
 	return e
 }
 
