@@ -46,7 +46,6 @@ func NewUpdate(cfg entity.Config) *entity.Entity {
 
 			return e.PublishRawState(client, data)
 		}).
-		RunAtStart().
 		Interval(time.Hour).
 		Build()
 }

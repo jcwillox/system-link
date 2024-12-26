@@ -33,6 +33,7 @@ type CoreConfig struct {
 	} `yaml:"mqtt"`
 	LogLevel     string `yaml:"log_level" default:"info" validate:"required,oneof=trace debug info warn error fatal panic"`
 	LogLevelMqtt string `yaml:"log_level_mqtt" default:"error" validate:"required,oneof=critical error warn debug"`
+	LogTiming    bool   `yaml:"log_timing" default:"false"`
 }
 
 func (c *CoreConfig) AvailabilityTopic() string {

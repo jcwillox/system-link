@@ -306,38 +306,32 @@ func (e *BuildConfig) Schedule(handler SetupFn) *BuildConfig {
 	e.DefaultStateTopic().OnSetup(func(entity *Entity, client mqtt.Client, scheduler gocron.Scheduler) error {
 		log.Info().Str("name", e.Config.Name).Dur("interval", e.UpdateInterval).Msg("scheduling update")
 
-		var options []gocron.JobOption
+		job, err := scheduler.NewJob(
+			gocron.DurationJob(e.UpdateInterval),
+			gocron.NewTask(func() {
+				start := time.Now()
 
-		if e.runScheduleAtStart {
-			options = append(options, gocron.WithStartAt(gocron.WithStartImmediately()))
-		}
+				err := handler(entity, client, scheduler)
 
-		job, err := scheduler.NewJob(gocron.DurationJob(e.UpdateInterval), gocron.NewTask(func() {
-			err := handler(entity, client, scheduler)
-			if err != nil {
-				log.Err(err).Str("name", e.Config.Name).Msg("failed to update")
-			}
-		}), options...)
-
+				if config.Config.LogTiming {
+					log.Info().Str("name", e.Config.Name).Stringer("duration", time.Since(start)).Msg("updated")
+				}
+				if err != nil {
+					log.Err(err).Str("name", e.Config.Name).Msg("failed to update")
+				}
+			}),
+			gocron.WithStartAt(gocron.WithStartImmediately()),
+		)
 		if err != nil {
-			log.Err(err).Str("name", e.Config.Name).Msg("failed to schedule update")
+			return err
 		}
 
 		e.OnCleanup(func(entity *Entity, client mqtt.Client, scheduler gocron.Scheduler) error {
-			err := scheduler.RemoveJob(job.ID())
-			if err != nil {
-				log.Err(err).Str("name", e.Config.Name).Msg("failed to remove job")
-			}
-			return nil
+			return scheduler.RemoveJob(job.ID())
 		})
 
 		return nil
 	})
-	return e
-}
-
-func (e *BuildConfig) RunAtStart() *BuildConfig {
-	e.runScheduleAtStart = true
 	return e
 }
 
