@@ -5,7 +5,6 @@ import (
 	"github.com/go-co-op/gocron/v2"
 	"github.com/jcwillox/system-bridge/entity"
 	"github.com/shirou/gopsutil/v4/disk"
-	"strings"
 )
 
 type DiskConfig struct {
@@ -34,7 +33,7 @@ func NewDisk(cfg DiskConfig) []*entity.Entity {
 	for _, mount := range getMountpoints(cfg.Mountpoints) {
 		newEntity := entity.NewEntity(cfg.Config).
 			Type(entity.DomainSensor).
-			ID("disk_" + strings.ReplaceAll(mount, ":", "")).
+			ID("disk_" + mount).
 			Name(mount).
 			Icon("mdi:harddisk").
 			StateClass("measurement").
@@ -59,7 +58,7 @@ func NewDiskUsed(cfg DiskConfig) []*entity.Entity {
 	for _, mount := range getMountpoints(cfg.Mountpoints) {
 		newEntity := entity.NewEntity(cfg.Config).
 			Type(entity.DomainSensor).
-			ID("disk_used_" + strings.ReplaceAll(mount, ":", "")).
+			ID("disk_used_" + mount).
 			Name(mount + " Used").
 			Icon("mdi:harddisk").
 			StateClass("measurement").
@@ -85,7 +84,7 @@ func NewDiskFree(cfg DiskConfig) []*entity.Entity {
 	for _, mount := range getMountpoints(cfg.Mountpoints) {
 		newEntity := entity.NewEntity(cfg.Config).
 			Type(entity.DomainSensor).
-			ID("disk_free_" + strings.ReplaceAll(mount, ":", "")).
+			ID("disk_free_" + mount).
 			Name(mount + " Free").
 			Icon("mdi:harddisk").
 			StateClass("measurement").

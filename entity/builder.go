@@ -121,6 +121,8 @@ func (e *BuildConfig) ID(id string) *BuildConfig {
 	if e.Config.Name == "" {
 		e.Config.Name = cases.Title(language.English).String(strings.ReplaceAll(id, "_", " "))
 	}
+	id = strings.ReplaceAll(id, ":", "")
+	id = strings.ReplaceAll(id, "/", "_")
 	if e.objectID == "" {
 		e.objectID = id
 	}
@@ -131,6 +133,8 @@ func (e *BuildConfig) ID(id string) *BuildConfig {
 }
 
 func (e *BuildConfig) ObjectID(id string) *BuildConfig {
+	id = strings.ReplaceAll(id, ":", "")
+	id = strings.ReplaceAll(id, "/", "_")
 	e.objectID = id
 	return e
 }
