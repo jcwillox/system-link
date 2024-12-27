@@ -9,7 +9,6 @@ import (
 	"golang.org/x/sys/execabs"
 	"html/template"
 	"runtime"
-	"syscall"
 )
 
 type CommandConfig struct {
@@ -93,10 +92,8 @@ func RunCommand(command string, shell string, hidden *bool, showErrors bool, det
 
 	cmd := execabs.Command(args[0], args[1:]...)
 
-	if runtime.GOOS == "windows" && (hidden == nil || *hidden) {
-		cmd.SysProcAttr = &syscall.SysProcAttr{
-			HideWindow: true,
-		}
+	if hidden == nil || *hidden {
+		makeCmdHidden(cmd)
 	}
 
 	if detached {

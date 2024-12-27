@@ -17,7 +17,7 @@ builds:
     flags:
       - -trimpath
     ldflags:
-      - -s -w -H=windowsgui
+      - -s -w {{ if eq .Os "windows" }}-H=windowsgui{{ end }}
 
 archives:
   - format: tar.gz
