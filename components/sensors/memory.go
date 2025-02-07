@@ -5,6 +5,7 @@ import (
 	"github.com/go-co-op/gocron/v2"
 	"github.com/jcwillox/system-link/entity"
 	"github.com/shirou/gopsutil/v4/mem"
+	"math"
 )
 
 const Gibibyte = 1024 * 1024 * 1024
@@ -17,13 +18,15 @@ func NewMemory(cfg entity.Config) *entity.Entity {
 		Icon("mdi:memory").
 		StateClass("measurement").
 		Unit("%").
-		Precision(1).
+		Precision(0).
 		Schedule(func(e *entity.Entity, client mqtt.Client, scheduler gocron.Scheduler) error {
 			memory, err := mem.VirtualMemory()
 			if err != nil {
 				return err
 			}
-			return e.PublishState(client, memory.UsedPercent)
+			used := memory.Total - memory.Available
+			percent := float64(used) / float64(memory.Total) * 100
+			return e.PublishState(client, math.Round(percent*10)/10)
 		}).Build()
 }
 
@@ -42,7 +45,8 @@ func NewMemoryUsed(cfg entity.Config) *entity.Entity {
 			if err != nil {
 				return err
 			}
-			return e.PublishState(client, float64(memory.Used)/Gibibyte)
+			used := memory.Total - memory.Available
+			return e.PublishState(client, float64(used)/Gibibyte)
 		}).Build()
 }
 
@@ -61,6 +65,6 @@ func NewMemoryFree(cfg entity.Config) *entity.Entity {
 			if err != nil {
 				return err
 			}
-			return e.PublishState(client, float64(memory.Free)/Gibibyte)
+			return e.PublishState(client, float64(memory.Available)/Gibibyte)
 		}).Build()
 }
