@@ -4,5 +4,11 @@ tasks:
   build:
     cmd: go build -trimpath -ldflags '-s -w -H=windowsgui' -o testdata/
 
+  build:linux:
+    env:
+      GOOS: linux
+      GOARCH: amd64
+    cmd: go build -trimpath -ldflags '-s -w' -o testdata/
+
   build:all:
     cmd: goreleaser release --clean --snapshot
