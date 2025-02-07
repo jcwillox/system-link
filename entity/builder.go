@@ -127,7 +127,7 @@ func (e *BuildConfig) ID(id string) *BuildConfig {
 		e.objectID = id
 	}
 	if e.Config.UniqueID == "" {
-		e.Config.UniqueID = fmt.Sprintf("%s_%s_%s", config.Config.HostID, id, "system-link")
+		e.Config.UniqueID = id
 	}
 	return e
 }
@@ -384,6 +384,9 @@ func NewEntity(cfg Config) *BuildConfig {
 func (e *BuildConfig) Build() *Entity {
 	// todo make unique id properly unique
 	// todo check runtime variables exist
+	if e.Config.UniqueID != "" {
+		e.Config.UniqueID = fmt.Sprintf("%s-%s-%s", "system-link", config.Config.HostID, e.Config.UniqueID)
+	}
 	return &Entity{config: e.EnabledByDefault().Interval(30 * time.Second)}
 
 }
