@@ -54,6 +54,10 @@ func (l InstanceLock) LockedProcess() (*process.Process, int, error) {
 // KillLockedPid kills the process with the pid in the lock file
 func (l InstanceLock) KillLockedPid() error {
 	proc, pid, err := l.LockedProcess()
+	// don't kill ourselves
+	if pid == os.Getpid() {
+		return nil
+	}
 	// lockfile or process not found
 	if errors.Is(err, os.ErrNotExist) || errors.Is(err, process.ErrorProcessNotRunning) {
 		return nil
