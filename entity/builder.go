@@ -5,7 +5,7 @@ import (
 	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/go-co-op/gocron/v2"
-	"github.com/jcwillox/system-bridge/config"
+	"github.com/jcwillox/system-link/config"
 	"github.com/rs/zerolog/log"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
@@ -127,7 +127,7 @@ func (e *BuildConfig) ID(id string) *BuildConfig {
 		e.objectID = id
 	}
 	if e.Config.UniqueID == "" {
-		e.Config.UniqueID = fmt.Sprintf("%s_%s_%s", config.Config.HostID, id, "system-bridge")
+		e.Config.UniqueID = fmt.Sprintf("%s_%s_%s", config.Config.HostID, id, "system-link")
 	}
 	return e
 }

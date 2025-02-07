@@ -1,4 +1,4 @@
-module github.com/jcwillox/system-bridge
+module github.com/jcwillox/system-link
 
 go 1.23
 

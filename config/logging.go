@@ -3,7 +3,7 @@ package config
 import (
 	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
-	"github.com/jcwillox/system-bridge/utils"
+	"github.com/jcwillox/system-link/utils"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"gopkg.in/natefinch/lumberjack.v2"

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/go-co-op/gocron/v2"
-	"github.com/jcwillox/system-bridge/config"
+	"github.com/jcwillox/system-link/config"
 	"github.com/rs/zerolog/log"
 )
 
@@ -57,7 +57,7 @@ func SetupMQTT(onConn mqtt.OnConnectHandler) func() {
 	// create client options
 	opts := mqtt.NewClientOptions().
 		AddBroker(url).
-		SetClientID("system-bridge-" + config.Config.HostID).
+		SetClientID("system-link-" + config.Config.HostID).
 		SetUsername(config.Config.MQTT.Username).
 		SetPassword(config.Config.MQTT.Password).
 		SetConnectRetry(true).

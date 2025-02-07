@@ -1,6 +1,6 @@
 package locks
 
-import "github.com/jcwillox/system-bridge/entity"
+import "github.com/jcwillox/system-link/entity"
 
 type Config struct {
 	Custom *CustomConfig `yaml:"custom,omitempty"`

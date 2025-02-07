@@ -5,8 +5,8 @@ package switches
 import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/go-co-op/gocron/v2"
-	"github.com/jcwillox/system-bridge/entity"
-	"github.com/jcwillox/system-bridge/utils"
+	"github.com/jcwillox/system-link/entity"
+	"github.com/jcwillox/system-link/utils"
 	"github.com/rs/zerolog/log"
 	"golang.org/x/sys/windows/registry"
 )
@@ -18,7 +18,7 @@ func createStartupEntry() error {
 	}
 	defer key.Close()
 
-	return key.SetStringValue("SystemBridge", utils.ExePath)
+	return key.SetStringValue("SystemLink", utils.ExePath)
 }
 
 func deleteStartupEntry() error {
@@ -28,7 +28,7 @@ func deleteStartupEntry() error {
 		return err
 	}
 	defer key.Close()
-	return key.DeleteValue("SystemBridge")
+	return key.DeleteValue("SystemLink")
 }
 
 func hasStartupEntry() (bool, error) {
@@ -38,7 +38,7 @@ func hasStartupEntry() (bool, error) {
 	}
 	defer key.Close()
 
-	startupPath, _, err := key.GetStringValue("SystemBridge")
+	startupPath, _, err := key.GetStringValue("SystemLink")
 	if err != nil {
 		return false, nil
 	}

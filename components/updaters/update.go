@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/go-co-op/gocron/v2"
-	"github.com/jcwillox/system-bridge/config"
-	"github.com/jcwillox/system-bridge/entity"
-	"github.com/jcwillox/system-bridge/utils/update"
+	"github.com/jcwillox/system-link/config"
+	"github.com/jcwillox/system-link/entity"
+	"github.com/jcwillox/system-link/utils/update"
 	"github.com/rs/zerolog/log"
 	"time"
 )
@@ -37,7 +37,7 @@ func NewUpdate(cfg entity.Config) *entity.Entity {
 			data, err := json.Marshal(map[string]interface{}{
 				"installed_version": config.Version,
 				"latest_version":    latestVersion,
-				"title":             "System Bridge",
+				"title":             "System Link",
 				"release_url":       config.RepoUrl + "/releases/tag/v" + latestVersion,
 			})
 			if err != nil {

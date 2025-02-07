@@ -1,8 +1,8 @@
 package binary_sensors
 
 import (
-	"github.com/jcwillox/system-bridge/config"
-	"github.com/jcwillox/system-bridge/entity"
+	"github.com/jcwillox/system-link/config"
+	"github.com/jcwillox/system-link/entity"
 )
 
 func NewStatus(cfg entity.Config) *entity.Entity {

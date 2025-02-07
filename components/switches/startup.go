@@ -3,7 +3,7 @@
 package switches
 
 import (
-	"github.com/jcwillox/system-bridge/entity"
+	"github.com/jcwillox/system-link/entity"
 )
 
 func NewStartup(cfg entity.Config) *entity.Entity {

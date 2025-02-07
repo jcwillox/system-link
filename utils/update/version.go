@@ -1,7 +1,7 @@
 package update
 
 import (
-	"github.com/jcwillox/system-bridge/config"
+	"github.com/jcwillox/system-link/config"
 	"net/http"
 	"path"
 	"runtime"
@@ -18,7 +18,7 @@ func GetLatestVersion() (string, error) {
 
 func GetDownloadURL(version string) string {
 	downloadUrl := config.RepoUrl + "/releases/download/" + version +
-		"/system_bridge_" + version + "_" + runtime.GOOS + "_" + runtime.GOARCH
+		"/system_link_" + version + "_" + runtime.GOOS + "_" + runtime.GOARCH
 	if runtime.GOOS == "windows" {
 		return downloadUrl + ".zip"
 	}

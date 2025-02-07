@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# system-bridge install script
+# system-link install script
 # contains code from and inspired by
 # https://github.com/twpayne/chezmoi
 # https://github.com/client9/shlib
@@ -19,7 +19,7 @@ TAGARG=latest
 LOG_LEVEL=2
 EXECARGS=
 
-GITHUB_DOWNLOAD=https://github.com/jcwillox/system-bridge/releases/download
+GITHUB_DOWNLOAD=https://github.com/jcwillox/system-link/releases/download
 
 tmpdir=$(mktemp -d)
 trap 'rm -rf ${tmpdir}' EXIT
@@ -27,13 +27,13 @@ trap 'rm -rf ${tmpdir}' EXIT
 usage() {
 	this="$1"
 	cat <<EOF
-${this}: download system-bridge and optionally run system-bridge
+${this}: download system-link and optionally run system-link
 
-Usage: ${this} [-b bindir] [-d] [-t tag] [system-bridge-args]
+Usage: ${this} [-b bindir] [-d] [-t tag] [system-link-args]
   -b sets the installation directory, default is ${BINDIR}.
   -d enables debug logging.
   -t sets the tag, default is ${TAG}.
-If system-bridge-args are given, after install system-bridge is executed with system-bridge-args.
+If system-link-args are given, after install system-link is executed with system-link-args.
 EOF
 	exit 2
 }
@@ -74,7 +74,7 @@ main() {
 	esac
 
 	# download tarball
-	NAME="system_bridge_${VERSION}_${GOOS}_${GOARCH}"
+	NAME="system_link_${VERSION}_${GOOS}_${GOARCH}"
 	TARBALL="${NAME}.${FORMAT}"
 	TARBALL_URL="${GITHUB_DOWNLOAD}/${TAG}/${TARBALL}"
 	http_download "${tmpdir}/${TARBALL}" "${TARBALL_URL}" || exit 1
@@ -91,7 +91,7 @@ main() {
 
 	# install binary
 	test ! -d "${BINDIR}" && install -d "${BINDIR}"
-	BINARY="system-bridge${BINSUFFIX}"
+	BINARY="system-link${BINSUFFIX}"
 	install "${tmpdir}/${BINARY}" "${BINDIR}/"
 	log_info "installed ${BINDIR}/${BINARY}"
 
@@ -197,7 +197,7 @@ get_libc() {
 real_tag() {
 	tag=$1
 	log_debug "checking GitHub for tag ${tag}"
-	release_url="https://github.com/jcwillox/system-bridge/releases/${tag}"
+	release_url="https://github.com/jcwillox/system-link/releases/${tag}"
 	json=$(http_get "${release_url}" "Accept: application/json")
 	if [ -z "${json}" ]; then
 		log_err "real_tag error retrieving GitHub release ${tag}"

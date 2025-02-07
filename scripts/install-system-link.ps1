@@ -1,4 +1,4 @@
-# system-bridge install script
+# system-link install script
 # contains code from and inspired by
 # https://github.com/twpayne/chezmoi
 
@@ -177,7 +177,7 @@ function get-real-tag {
 
     log-debug "checking GitHub for tag $tag"
 
-    $release_url = "https://github.com/jcwillox/system-bridge/releases/$tag"
+    $release_url = "https://github.com/jcwillox/system-link/releases/$tag"
     $real_tag = (Fetch-JsonFromWeb $release_url).tag_name
 
     log-debug "found tag $real_tag for $tag"
@@ -228,18 +228,18 @@ function unpack-file {
 
 <#
     .SYNOPSIS
-    Install system bridge
+    Install system link
 
     .DESCRIPTION
-    Installs system-bridge to the given directory, defaulting to ~/.local/bin
+    Installs system-link to the given directory, defaulting to ~/.local/bin
 
     You can specify a particular git tag using the -Tag option.
 
     Examples:
-    '$params = "-BinDir ~/bindir"', (iwr https://tinyurl.com/system-bridge-ps1).Content | powershell -c -
-    '$params = "-Tag v1.8.10"', (iwr https://tinyurl.com/system-bridge-ps1).Content | powershell -c -
+    '$params = "-BinDir ~/bindir"', (iwr https://tinyurl.com/system-link-ps1).Content | powershell -c -
+    '$params = "-Tag v1.8.10"', (iwr https://tinyurl.com/system-link-ps1).Content | powershell -c -
 #>
-function Install-SystemBridge {
+function Install-SystemLink {
     [CmdletBinding(PositionalBinding=$false)]
     param(
         [Parameter(Mandatory = $false)]
@@ -276,11 +276,11 @@ function Install-SystemBridge {
         $format = "zip"
     }
 
-    $github_download = "https://github.com/jcwillox/system-bridge/releases/download"
+    $github_download = "https://github.com/jcwillox/system-link/releases/download"
     New-Item -Type Directory -Path $tempdir | Out-Null
 
     # download tarball
-    $name="system_bridge_$($version)_$($os)_$($arch)"
+    $name="system_link_$($version)_$($os)_$($arch)"
     $tarball="$name.$format"
     $tarball_url="$($github_download)/$real_tag/$tarball"
 
@@ -306,7 +306,7 @@ function Install-SystemBridge {
         New-Item -Type Directory -Path $BinDir | Out-Null
     }
 
-    $binary = "system-bridge$($binsuffix)";
+    $binary = "system-link$($binsuffix)";
     $tmp_binary = (Join-Path $tempdir $binary);
 
     Move-Item -Force -Path $tmp_binary -Destination $BinDir
@@ -319,7 +319,7 @@ function Install-SystemBridge {
 }
 
 try {
-    Invoke-Expression ("Install-SystemBridge " + $params)
+    Invoke-Expression ("Install-SystemLink " + $params)
 } catch {
     Write-Host "An error occurred while installing: $_"
 } finally {

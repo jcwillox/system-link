@@ -1,7 +1,7 @@
 package entity
 
 import (
-	"github.com/jcwillox/system-bridge/config"
+	"github.com/jcwillox/system-link/config"
 )
 
 type DiscoveryConfig struct {

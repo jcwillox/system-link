@@ -2,8 +2,8 @@ package update
 
 import (
 	"fmt"
-	"github.com/jcwillox/system-bridge/config"
-	"github.com/jcwillox/system-bridge/utils"
+	"github.com/jcwillox/system-link/config"
+	"github.com/jcwillox/system-link/utils"
 	"github.com/rs/zerolog/log"
 	"os"
 	"path/filepath"
@@ -78,14 +78,14 @@ func Update() error {
 	// ignore error as it will fail on windows as executable is still running
 	_ = os.Remove(utils.ExePath + ".old")
 
-	log.Info().Msg("restarting system-bridge for update")
+	log.Info().Msg("restarting system-link for update")
 
 	if runtime.GOOS == "windows" {
 		_, err := os.StartProcess(utils.ExePath, os.Args, &os.ProcAttr{
 			Files: []*os.File{os.Stdin, os.Stdout, os.Stderr},
 		})
 		if err != nil {
-			log.Err(err).Msg("failed to automatically restart system-bridge")
+			log.Err(err).Msg("failed to automatically restart system-link")
 			return err
 		}
 		os.Exit(0)
@@ -94,7 +94,7 @@ func Update() error {
 		// but it is not available on windows
 		err := syscall.Exec(utils.ExePath, os.Args, os.Environ())
 		if err != nil {
-			log.Err(err).Msg("failed to automatically restart system-bridge")
+			log.Err(err).Msg("failed to automatically restart system-link")
 			return err
 		}
 	}

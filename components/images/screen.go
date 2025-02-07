@@ -4,7 +4,7 @@ import (
 	"bytes"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/go-co-op/gocron/v2"
-	"github.com/jcwillox/system-bridge/entity"
+	"github.com/jcwillox/system-link/entity"
 	"github.com/kbinani/screenshot"
 	"github.com/rs/zerolog/log"
 	"image/jpeg"

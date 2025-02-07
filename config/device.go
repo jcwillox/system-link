@@ -34,7 +34,7 @@ func loadDeviceConfig() {
 	hwVersion, _, _ := strings.Cut(info.PlatformVersion, " Build ")
 
 	Device = DeviceConfig{
-		Identifiers:  []string{"system-bridge-" + Config.HostID},
+		Identifiers:  []string{"system-link-" + Config.HostID},
 		Name:         Config.DeviceName,
 		Manufacturer: info.OS,
 		Model:        info.Platform,

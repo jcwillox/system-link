@@ -1,6 +1,6 @@
 package images
 
-import "github.com/jcwillox/system-bridge/entity"
+import "github.com/jcwillox/system-link/entity"
 
 type Config struct {
 	Screen *entity.Config `yaml:"screen,omitempty"`

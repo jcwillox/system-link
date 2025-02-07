@@ -36,7 +36,7 @@ nfpms:
   - file_name_template: '{{ .PackageName }}_{{ .Version }}_{{- if eq .Arch "386" }}i386{{- else }}{{ .Arch }}{{ end }}'
     license: MIT
     maintainer: Joshua Cowie-Willox <joshwillox@gmail.com>
-    homepage: https://github.com/jcwillox/system-bridge
+    homepage: https://github.com/jcwillox/system-link
     description: "A powerful bootstrapping utility for your dotfiles and system"
     bindir: /usr/bin
     formats:

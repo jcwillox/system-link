@@ -5,8 +5,8 @@ import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/go-co-op/gocron/v2"
 	"github.com/google/uuid"
-	"github.com/jcwillox/system-bridge/entity"
-	"github.com/jcwillox/system-bridge/utils"
+	"github.com/jcwillox/system-link/entity"
+	"github.com/jcwillox/system-link/utils"
 	"github.com/rs/zerolog/log"
 )
 

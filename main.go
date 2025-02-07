@@ -2,11 +2,11 @@ package main
 
 import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
-	"github.com/jcwillox/system-bridge/config"
-	"github.com/jcwillox/system-bridge/engine"
-	"github.com/jcwillox/system-bridge/entity"
-	"github.com/jcwillox/system-bridge/utils"
-	"github.com/jcwillox/system-bridge/utils/update"
+	"github.com/jcwillox/system-link/config"
+	"github.com/jcwillox/system-link/engine"
+	"github.com/jcwillox/system-link/entity"
+	"github.com/jcwillox/system-link/utils"
+	"github.com/jcwillox/system-link/utils/update"
 	"github.com/rs/zerolog/log"
 	"os"
 	"os/signal"

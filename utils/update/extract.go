@@ -34,7 +34,7 @@ func extractTarGz(archivePath, outputPath string) error {
 		if err != nil {
 			return err
 		}
-		if header.Name == "system-bridge" {
+		if header.Name == "system-link" {
 			outputFile, err := os.Create(outputPath)
 			if err != nil {
 				return err
@@ -46,7 +46,7 @@ func extractTarGz(archivePath, outputPath string) error {
 		}
 	}
 
-	return fmt.Errorf("file 'system-bridge' not found in tar.gz archive")
+	return fmt.Errorf("file 'system-link' not found in tar.gz archive")
 }
 
 func extractZip(archivePath, outputPath string) error {
@@ -57,7 +57,7 @@ func extractZip(archivePath, outputPath string) error {
 	defer reader.Close()
 
 	for _, f := range reader.File {
-		if f.Name == "system-bridge.exe" {
+		if f.Name == "system-link.exe" {
 			rc, err := f.Open()
 			if err != nil {
 				return err
@@ -75,5 +75,5 @@ func extractZip(archivePath, outputPath string) error {
 		}
 	}
 
-	return fmt.Errorf("file 'system-bridge.exe' not found in zip archive")
+	return fmt.Errorf("file 'system-link.exe' not found in zip archive")
 }

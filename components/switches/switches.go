@@ -1,7 +1,7 @@
 package switches
 
 import (
-	"github.com/jcwillox/system-bridge/entity"
+	"github.com/jcwillox/system-link/entity"
 )
 
 type Config struct {
