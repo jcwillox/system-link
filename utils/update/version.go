@@ -17,7 +17,7 @@ func GetLatestVersion() (string, error) {
 }
 
 func GetDownloadURL(version string) string {
-	downloadUrl := config.RepoUrl + "/releases/download/" + version +
+	downloadUrl := config.RepoUrl + "/releases/download/v" + version +
 		"/system_link_" + version + "_" + runtime.GOOS + "_" + runtime.GOARCH
 	if runtime.GOOS == "windows" {
 		return downloadUrl + ".zip"

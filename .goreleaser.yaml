@@ -3,6 +3,9 @@
 
 version: 2
 
+release:
+  use_existing_draft: true
+
 before:
   hooks:
     - go mod tidy
@@ -24,6 +27,7 @@ archives:
     # this name template makes the OS and Arch compatible with the results of `uname`.
     name_template: >-
       {{ replace .ProjectName "-" "_" }}_
+      {{- .Version }}_
       {{- .Os }}_
       {{- .Arch }}
       {{- if .Arm }}v{{ .Arm }}{{ end }}
@@ -33,7 +37,7 @@ archives:
         formats: zip
 
 nfpms:
-  - file_name_template: '{{ .PackageName }}_{{ .Version }}_{{- if eq .Arch "386" }}i386{{- else }}{{ .Arch }}{{ end }}'
+  - file_name_template: '{{ replace .ProjectName "-" "_" }}_{{ .Version }}_{{ .Arch }}'
     license: MIT
     maintainer: Joshua Cowie-Willox <joshwillox@gmail.com>
     homepage: https://github.com/jcwillox/system-link
