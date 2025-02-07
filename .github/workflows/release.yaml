@@ -7,6 +7,14 @@ on:
       - "alpha"
   workflow_dispatch:
     inputs:
+      draft:
+        type: boolean
+        description: "Draft release"
+        default: false
+      discussion:
+        type: boolean
+        description: "Create discussion"
+        default: false
       release_type:
         type: choice
         description: "Release type"
@@ -58,8 +66,8 @@ jobs:
         run: pnpm dlx @jcwillox/semantic-release-config
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SEMANTIC_RELEASE_GITHUB_DRAFT: true
+          SEMANTIC_RELEASE_GITHUB_DRAFT: ${{ inputs.draft }}
+          SEMANTIC_RELEASE_GITHUB_DISCUSSION: ${{ inputs.discussion }}
           SEMANTIC_RELEASE_FORCE_RELEASE: ${{ inputs.release_type }}
-          SEMANTIC_RELEASE_CMD_PUBLISH: |
-            echo "${nextRelease.notes}" > /tmp/release-notes.md
-            goreleaser release --release-notes /tmp/release-notes.md --clean
+          SEMANTIC_RELEASE_CMD_PRE_PUBLISH: "goreleaser release --skip publish --clean"
+          SEMANTIC_RELEASE_GITHUB_ASSETS: '["dist/checksums.txt", "dist/*.apk", "dist/*.deb", "dist/*.rpm", "dist/*.tar.gz", "dist/*.zip"]'

@@ -3,9 +3,6 @@
 
 version: 2
 
-release:
-  use_existing_draft: true
-
 before:
   hooks:
     - go mod tidy
@@ -20,7 +17,7 @@ builds:
     flags:
       - -trimpath
     ldflags:
-      - -s -w {{ if eq .Os "windows" }}-H=windowsgui{{ end }}
+      - -s -w -X main.version={{.Version}} {{ if eq .Os "windows" }}-H=windowsgui{{ end }}
 
 archives:
   - formats: tar.gz
