@@ -45,59 +45,11 @@ func (e *Entity) OnCleanup(fn SetupFn) *Entity {
 func (e *Entity) Name() string {
 	return e.config.Config.Name
 }
-func (e *Entity) Icon() string {
-	return e.config.Config.Icon
-}
-func (e *Entity) UniqueID() string {
-	return e.config.Config.UniqueID
-}
-func (e *Entity) EnabledByDefault() *bool {
-	return e.config.Config.EnabledByDefault
-}
-func (e *Entity) JsonAttributesTopic() string {
-	return e.config.Config.JsonAttributesTopic
-}
-func (e *Entity) ValueTemplate() string {
-	return e.config.Config.ValueTemplate
-}
-func (e *Entity) EntityCategory() string {
-	return e.config.Config.EntityCategory
-}
-func (e *Entity) EntityPicture() string {
-	return e.config.Config.EntityPicture
-}
-func (e *Entity) Unit() string {
-	return e.config.Config.UnitOfMeasurement
-}
-func (e *Entity) Precision() int {
-	return e.config.Config.SuggestedDisplayPrecision
-}
-func (e *Entity) StateClass() string {
-	return e.config.Config.StateClass
-}
-func (e *Entity) DeviceClass() string {
-	return e.config.Config.DeviceClass
-}
 func (e *Entity) StateTopic() string {
 	return e.config.stateTopic
 }
 func (e *Entity) CommandTopic() string {
 	return e.config.commandTopic
-}
-func (e *Entity) PayloadOn() string {
-	return e.config.Config.PayloadOn
-}
-func (e *Entity) PayloadOff() string {
-	return e.config.Config.PayloadOff
-}
-func (e *Entity) PayloadInstall() string {
-	return e.config.Config.PayloadInstall
-}
-func (e *Entity) PayloadLock() string {
-	return e.config.Config.PayloadLock
-}
-func (e *Entity) PayloadUnlock() string {
-	return e.config.Config.PayloadUnlock
 }
 
 /* INTERNAL AGGREGATE FUNCTIONS */
