@@ -6,6 +6,7 @@ import (
 	"github.com/go-co-op/gocron/v2"
 	"github.com/jcwillox/system-link/entity"
 	"github.com/rs/zerolog/log"
+	"math"
 )
 
 func NewBattery(cfg entity.Config) *entity.Entity {
@@ -34,7 +35,7 @@ func NewBattery(cfg entity.Config) *entity.Entity {
 				totalFull += b.Full
 			}
 			if totalFull > 0 {
-				return e.PublishState(client, (totalCurrent/totalFull)*100)
+				return e.PublishState(client, math.Round((totalCurrent/totalFull)*100))
 			}
 			return nil
 		}).Build()
