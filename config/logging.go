@@ -4,6 +4,7 @@ import (
 	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/jcwillox/system-link/utils"
+	"github.com/mattn/go-isatty"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"gopkg.in/natefinch/lumberjack.v2"
@@ -24,7 +25,13 @@ func (l MQTTLogger) Printf(format string, v ...interface{}) {
 }
 
 func SetupLogging() {
-	consoleWriter := zerolog.ConsoleWriter{Out: os.Stderr, TimeFormat: time.DateTime}
+	colored := isatty.IsTerminal(os.Stdout.Fd()) || isatty.IsCygwinTerminal(os.Stdout.Fd())
+
+	consoleWriter := zerolog.ConsoleWriter{
+		Out:        os.Stderr,
+		TimeFormat: time.DateTime,
+		NoColor:    !colored,
+	}
 
 	fileWriter := zerolog.ConsoleWriter{
 		Out: &lumberjack.Logger{
