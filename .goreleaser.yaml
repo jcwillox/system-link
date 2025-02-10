@@ -1,7 +1,9 @@
 # yaml-language-server: $schema=https://goreleaser.com/static/schema.json
 # vim: set ts=2 sw=2 tw=0 fo=cnqoj
-
 version: 2
+
+release:
+  disable: true
 
 before:
   hooks:
@@ -21,7 +23,6 @@ builds:
 
 archives:
   - formats: tar.gz
-    # this name template makes the OS and Arch compatible with the results of `uname`.
     name_template: >-
       {{ replace .ProjectName "-" "_" }}_
       {{- .Version }}_
@@ -44,6 +45,24 @@ nfpms:
       - apk
       - rpm
       - deb
+
+dockers:
+  - image_templates:
+      - "ghcr.io/jcwillox/{{ .ProjectName }}:{{ .Tag }}"
+      - "ghcr.io/jcwillox/{{ .ProjectName }}:v{{ .Major }}"
+      - "ghcr.io/jcwillox/{{ .ProjectName }}:latest"
+    goarch: amd64
+    goos: linux
+    build_flag_templates:
+      - --platform=linux/amd64
+      - --label=org.opencontainers.image.title={{ .ProjectName }}
+      - --label=org.opencontainers.image.url=https://github.com/jcwillox/{{ .ProjectName }}
+      - --label=org.opencontainers.image.source=https://github.com/jcwillox/{{ .ProjectName }}
+      - --label=org.opencontainers.image.documentation=https://github.com/jcwillox/{{ .ProjectName }}/blob/main/README.md
+      - --label=org.opencontainers.image.version={{ .Version }}
+      - --label=org.opencontainers.image.created={{ time "2006-01-02T15:04:05Z07:00" }}
+      - --label=org.opencontainers.image.revision={{ .FullCommit }}
+      - --label=org.opencontainers.image.licenses=MIT
 
 checksum:
   name_template: 'checksums.txt'

@@ -37,9 +37,17 @@ jobs:
       contents: write
       issues: write
       pull-requests: write
+      packages: write
     steps:
       - name: "Checkout the repository"
         uses: actions/checkout@v4
+
+      - name: "Login to GitHub Container Registry"
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: "Setup pnpm"
         uses: pnpm/action-setup@v4
@@ -69,5 +77,5 @@ jobs:
           SEMANTIC_RELEASE_GITHUB_DRAFT: ${{ inputs.draft }}
           SEMANTIC_RELEASE_GITHUB_DISCUSSION: ${{ inputs.discussion }}
           SEMANTIC_RELEASE_FORCE_RELEASE: ${{ inputs.release_type }}
-          SEMANTIC_RELEASE_CMD_PRE_PUBLISH: "goreleaser release --skip publish --clean"
+          SEMANTIC_RELEASE_CMD_PRE_PUBLISH: "goreleaser release --clean"
           SEMANTIC_RELEASE_GITHUB_ASSETS: '["dist/checksums.txt", "dist/*.apk", "dist/*.deb", "dist/*.rpm", "dist/*.tar.gz", "dist/*.zip"]'
