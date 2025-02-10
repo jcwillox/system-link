@@ -6,6 +6,7 @@ import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/go-co-op/gocron/v2"
 	"github.com/jcwillox/system-link/config"
+	"github.com/jcwillox/system-link/filters"
 	"github.com/rs/zerolog/log"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
@@ -59,8 +60,8 @@ type Config struct {
 	// https://www.home-assistant.io/integrations/sensor.mqtt/#options
 	Options []string `json:"options,omitempty"`
 
-	//Filters        engine.Filters `json:"filters,omitempty"`
-	UpdateInterval time.Duration `yaml:"update_interval"`
+	filters.Filters `yaml:",inline"`
+	UpdateInterval  time.Duration `yaml:"update_interval"`
 
 	PayloadOn      string `json:"payload_on,omitempty"`
 	PayloadOff     string `json:"payload_off,omitempty"`

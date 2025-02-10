@@ -1,9 +1,11 @@
 package entity
 
 import (
+	"errors"
 	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/go-co-op/gocron/v2"
+	"github.com/jcwillox/system-link/filters"
 	"github.com/rs/zerolog/log"
 )
 
@@ -19,6 +21,16 @@ func (e *Entity) Entity() *Entity {
 /* PUBLIC ENTITY UTILS */
 
 func (e *Entity) PublishState(client mqtt.Client, state interface{}) error {
+	var err error
+	if len(e.config.Filters.Filters) > 0 {
+		state, err = e.config.Filter(state)
+		if err != nil {
+			if errors.Is(err, filters.SkipSendErr) {
+				return nil
+			}
+			return err
+		}
+	}
 	return e.PublishRawState(client, fmt.Sprint(state))
 }
 
