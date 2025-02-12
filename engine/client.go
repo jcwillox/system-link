@@ -61,6 +61,7 @@ func SetupMQTT(onConn mqtt.OnConnectHandler) func() {
 		SetUsername(config.Config.MQTT.Username).
 		SetPassword(config.Config.MQTT.Password).
 		SetConnectRetry(true).
+		SetOrderMatters(false).
 		SetTLSConfig(&tls.Config{
 			InsecureSkipVerify: false, // TODO: allow no verify / custom ssl
 		})

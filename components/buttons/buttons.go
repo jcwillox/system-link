@@ -5,6 +5,7 @@ import (
 )
 
 type Config struct {
+	ResetTopics   *entity.Config `yaml:"reset_topics,omitempty"`
 	Custom        *CustomConfig  `yaml:"custom,omitempty"`
 	Lock          *entity.Config `yaml:"lock,omitempty"`
 	Sleep         *entity.Config `yaml:"sleep,omitempty"`
@@ -17,6 +18,9 @@ type Config struct {
 func (c *Config) LoadEntities() []*entity.Entity {
 	var entities []*entity.Entity
 
+	if c.ResetTopics != nil {
+		entities = append(entities, NewResetTopics(*c.ResetTopics))
+	}
 	if c.Custom != nil {
 		entities = append(entities, NewCustom(*c.Custom))
 	}
