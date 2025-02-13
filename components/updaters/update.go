@@ -37,6 +37,7 @@ func NewUpdate(cfg entity.Config) *entity.Entity {
 				log.Err(err).Msg("failed to update")
 			}
 		}).
+		Interval(time.Hour).
 		Schedule(func(e *entity.Entity, client mqtt.Client, scheduler gocron.Scheduler) error {
 			log.Debug().Msg("checking for updates")
 
@@ -60,6 +61,5 @@ func NewUpdate(cfg entity.Config) *entity.Entity {
 
 			return e.PublishRawState(client, data)
 		}).
-		Interval(time.Hour).
 		Build()
 }

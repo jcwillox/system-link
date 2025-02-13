@@ -2,6 +2,7 @@ package entity
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/go-co-op/gocron/v2"
@@ -78,13 +79,15 @@ type BuildConfig struct {
 	setupFns   []SetupFn
 	cleanupFns []SetupFn
 
+	job           gocron.Job
+	jobDefinition gocron.JobDefinition
+	jobTask       gocron.Task
+
 	componentType Domain
 	objectID      string
 
 	stateTopic   string
 	commandTopic string
-
-	runScheduleAtStart bool
 
 	Config
 }
@@ -228,6 +231,9 @@ func (e *BuildConfig) DisableAvailability() *BuildConfig {
 }
 
 func (e *BuildConfig) Interval(interval time.Duration) *BuildConfig {
+	if e.jobDefinition != nil {
+		log.Fatal().Str("name", e.Config.Name).Msg("cannot set interval after job definition")
+	}
 	if e.Config.UpdateInterval == 0 {
 		e.Config.UpdateInterval = interval
 	}
@@ -308,12 +314,20 @@ func (e *BuildConfig) OnState(handler MessageFn) *BuildConfig {
 }
 
 func (e *BuildConfig) Schedule(handler SetupFn) *BuildConfig {
-	e.DefaultStateTopic().OnSetup(func(entity *Entity, client mqtt.Client, scheduler gocron.Scheduler) error {
-		log.Info().Str("name", e.Config.Name).Dur("interval", e.UpdateInterval).Msg("scheduling update")
+	return e.Interval(30*time.Second).ScheduleJob(gocron.DurationJob(e.UpdateInterval), handler).StartJob()
+}
 
-		job, err := scheduler.NewJob(
-			gocron.DurationJob(e.UpdateInterval),
-			gocron.NewTask(func() {
+func (e *BuildConfig) ScheduleJob(jobDefinition gocron.JobDefinition, handler SetupFn) *BuildConfig {
+	e.DefaultStateTopic().
+		OnSetup(func(entity *Entity, client mqtt.Client, scheduler gocron.Scheduler) error {
+			log.Info().Str("name", e.Config.Name).Dur("interval", e.UpdateInterval).Msg("scheduling update")
+
+			if e.jobDefinition != nil {
+				log.Fatal().Str("name", e.Config.Name).Msg("entity can only have one job definition")
+			}
+
+			e.jobDefinition = jobDefinition
+			e.jobTask = gocron.NewTask(func() {
 				start := time.Now()
 
 				err := handler(entity, client, scheduler)
@@ -324,17 +338,36 @@ func (e *BuildConfig) Schedule(handler SetupFn) *BuildConfig {
 				if err != nil {
 					log.Err(err).Str("name", e.Config.Name).Msg("failed to update")
 				}
-			}),
-			gocron.WithStartAt(gocron.WithStartImmediately()),
-		)
-		if err != nil {
-			return err
-		}
+			})
 
-		e.OnCleanup(func(entity *Entity, client mqtt.Client, scheduler gocron.Scheduler) error {
-			return scheduler.RemoveJob(job.ID())
+			return nil
+		}).
+		OnCleanup(func(entity *Entity, client mqtt.Client, scheduler gocron.Scheduler) error {
+			if e.job != nil {
+				err := scheduler.RemoveJob(e.job.ID())
+				if err != nil && !errors.Is(err, gocron.ErrJobNotFound) {
+					return err
+				}
+				e.job = nil
+			}
+			return nil
 		})
+	return e
+}
 
+func (e *BuildConfig) StartJob() *BuildConfig {
+	e.OnSetup(func(entity *Entity, client mqtt.Client, scheduler gocron.Scheduler) error {
+		if e.job == nil {
+			job, err := scheduler.NewJob(
+				e.jobDefinition,
+				e.jobTask,
+				gocron.WithStartAt(gocron.WithStartImmediately()),
+			)
+			if err != nil {
+				return err
+			}
+			e.job = job
+		}
 		return nil
 	})
 	return e
@@ -388,6 +421,6 @@ func (e *BuildConfig) Build() *Entity {
 	if e.Config.UniqueID != "" {
 		e.Config.UniqueID = fmt.Sprintf("%s-%s-%s", "system-link", config.Config.HostID, e.Config.UniqueID)
 	}
-	return &Entity{config: e.EnabledByDefault().Interval(30 * time.Second)}
+	return &Entity{config: e.EnabledByDefault()}
 
 }

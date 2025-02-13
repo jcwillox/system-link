@@ -18,6 +18,58 @@ func (e *Entity) Entity() *Entity {
 	return e
 }
 
+/* JOB UTILS */
+
+func (e *Entity) StartJob(scheduler gocron.Scheduler) error {
+	if e.config.job == nil {
+		job, err := scheduler.NewJob(e.config.jobDefinition, e.config.jobTask)
+		if err != nil {
+			return err
+		}
+		e.config.job = job
+	}
+	return nil
+}
+
+func (e *Entity) StopJob(scheduler gocron.Scheduler) error {
+	if e.config.job != nil {
+		err := scheduler.RemoveJob(e.config.job.ID())
+		if err != nil && !errors.Is(err, gocron.ErrJobNotFound) {
+			return err
+		}
+		e.config.job = nil
+	}
+	return nil
+}
+
+func (e *Entity) UpdateJob(scheduler gocron.Scheduler, jobDefinition gocron.JobDefinition) error {
+	// update job definition
+	e.config.jobDefinition = jobDefinition
+	// if job exists, update it with new schedule
+	if e.config.job != nil {
+		job, err := scheduler.Update(e.config.job.ID(), jobDefinition, e.config.jobTask)
+		if err != nil {
+			return err
+		}
+		e.config.job = job
+	}
+	return nil
+}
+
+func (e *Entity) RunJob() error {
+	// if job exists, run it now in the scheduler
+	if e.config.job != nil {
+		return e.config.job.RunNow()
+	}
+	// otherwise invoke it directly
+	e.config.jobTask()
+	return nil
+}
+
+func (e *Entity) Job() gocron.Job {
+	return e.config.job
+}
+
 /* PUBLIC ENTITY UTILS */
 
 func (e *Entity) PublishState(client mqtt.Client, state interface{}) error {
