@@ -6,7 +6,6 @@ import (
 	"github.com/go-co-op/gocron/v2"
 	"github.com/jcwillox/system-link/entity"
 	"github.com/shirou/gopsutil/v4/cpu"
-	"time"
 )
 
 var ErrNoCPU = errors.New("no cpu found")
@@ -21,16 +20,13 @@ func NewCPU(cfg entity.Config) *entity.Entity {
 		Unit("%").
 		Precision(1).
 		Schedule(func(e *entity.Entity, client mqtt.Client, scheduler gocron.Scheduler) error {
-			percent, err := cpu.Percent(time.Second, false)
+			percent, err := cpu.Percent(0, false)
 			if err != nil {
 				return err
 			}
 			if len(percent) == 0 {
 				return ErrNoCPU
 			}
-			//if !entity.Filters(percent[0]) {
-			//	return nil
-			//}
 			return e.PublishState(client, percent[0])
 		}).Build()
 }
