@@ -10,13 +10,16 @@ import (
 	"runtime"
 )
 
-func Update() error {
+func Update(updateProgress func(progress float64)) error {
+	updateProgress(20)
+
 	// get latest version
 	latestVersion, err := GetLatestVersion()
 	log.Debug().Str("latest_version", latestVersion).Msg("latest version")
 	if err != nil || latestVersion == config.Version {
 		return err
 	}
+	updateProgress(40)
 
 	// get download url
 	downloadUrl := GetDownloadURL(latestVersion)
@@ -36,6 +39,7 @@ func Update() error {
 		return err
 	}
 	log.Info().Str("latest_version", latestVersion).Msg("update downloaded")
+	updateProgress(60)
 
 	// extract file
 	outputPath := utils.ExePath + ".new"
@@ -54,6 +58,7 @@ func Update() error {
 			return err
 		}
 	}
+	updateProgress(80)
 
 	// delete archive
 	err = os.Remove(archivePath)
@@ -76,6 +81,7 @@ func Update() error {
 	// delete old executable
 	// ignore error as it will fail on windows as executable is still running
 	_ = os.Remove(utils.ExePath + ".old")
+	updateProgress(100)
 
 	log.Info().Msg("restarting system-link for update")
 	return utils.RestartSelf()

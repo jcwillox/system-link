@@ -12,14 +12,27 @@ import (
 )
 
 func NewUpdate(cfg entity.Config) *entity.Entity {
+	var lastState map[string]interface{}
 	return entity.NewEntity(cfg).
 		Type(entity.DomainUpdate).
 		ID("update").
 		EntityCategory("config").
 		EntityPicture("https://api.iconify.design/mdi-bridge.svg?color=%2300acff&height=96").
 		PayloadInstall("install").
-		OnCommand(func(entity *entity.Entity, client mqtt.Client, scheduler gocron.Scheduler, message mqtt.Message) {
-			err := update.Update()
+		OnCommand(func(e *entity.Entity, client mqtt.Client, scheduler gocron.Scheduler, message mqtt.Message) {
+			updateProgress := func(progress float64) {
+				if lastState == nil {
+					return
+				}
+				lastState["update_percentage"] = progress
+				data, err := json.Marshal(lastState)
+				if err != nil {
+					return
+				}
+				_ = e.PublishRawState(client, data)
+			}
+
+			err := update.Update(updateProgress)
 			if err != nil {
 				log.Err(err).Msg("failed to update")
 			}
@@ -34,12 +47,13 @@ func NewUpdate(cfg entity.Config) *entity.Entity {
 
 			log.Debug().Str("latest_version", latestVersion).Msg("latest version")
 
-			data, err := json.Marshal(map[string]interface{}{
+			lastState = map[string]interface{}{
 				"installed_version": config.Version,
 				"latest_version":    latestVersion,
 				"title":             "System Link",
 				"release_url":       config.RepoUrl + "/releases/tag/v" + latestVersion,
-			})
+			}
+			data, err := json.Marshal(lastState)
 			if err != nil {
 				return err
 			}
