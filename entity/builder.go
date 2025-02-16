@@ -320,10 +320,10 @@ func (e *BuildConfig) Schedule(handler SetupFn) *BuildConfig {
 func (e *BuildConfig) ScheduleJob(jobDefinition gocron.JobDefinition, handler SetupFn) *BuildConfig {
 	e.DefaultStateTopic().
 		OnSetup(func(entity *Entity, client mqtt.Client, scheduler gocron.Scheduler) error {
-			log.Info().Str("name", e.Config.Name).Dur("interval", e.UpdateInterval).Msg("scheduling update")
+			log.Debug().Str("name", e.Config.Name).Dur("interval", e.UpdateInterval).Msg("scheduling update")
 
 			if e.jobDefinition != nil {
-				log.Fatal().Str("name", e.Config.Name).Msg("entity can only have one job definition")
+				log.Warn().Str("name", e.Config.Name).Msg("entity can only have one job definition")
 			}
 
 			e.jobDefinition = jobDefinition
@@ -350,6 +350,8 @@ func (e *BuildConfig) ScheduleJob(jobDefinition gocron.JobDefinition, handler Se
 				}
 				e.job = nil
 			}
+			e.jobDefinition = nil
+			e.jobTask = nil
 			return nil
 		})
 	return e
@@ -400,7 +402,7 @@ func NewEntity(cfg Config) *BuildConfig {
 				log.Err(err).Msg("failed to marshal item")
 			}
 
-			log.Info().Interface("config", discoveryConfig).Msg("discovery config")
+			log.Debug().Interface("config", discoveryConfig).Msg("discovery config")
 
 			configTopic := path.Join(config.Config.MQTT.DiscoveryTopic, e.config.componentType.String(), config.Config.HostID, e.config.objectID, "config")
 			token := client.Publish(configTopic, 0, true, data)
@@ -408,7 +410,6 @@ func NewEntity(cfg Config) *BuildConfig {
 				log.Err(token.Error()).Str("name", e.Name()).Msg("failed publishing config")
 			} else {
 				log.Debug().Str("name", e.Name()).Msg("sent config")
-				//pp.Println(entity)
 			}
 
 			return nil

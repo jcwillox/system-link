@@ -62,6 +62,12 @@ func SetupMQTT(onConn mqtt.OnConnectHandler) func() {
 		SetPassword(config.Config.MQTT.Password).
 		SetConnectRetry(true).
 		SetOrderMatters(false).
+		SetConnectionLostHandler(func(client mqtt.Client, err error) {
+			log.Err(err).Msg("mqtt: connection lost")
+		}).
+		SetReconnectingHandler(func(client mqtt.Client, options *mqtt.ClientOptions) {
+			log.Info().Msg("mqtt: attempting to reconnect...")
+		}).
 		SetTLSConfig(&tls.Config{
 			InsecureSkipVerify: false, // TODO: allow no verify / custom ssl
 		})
