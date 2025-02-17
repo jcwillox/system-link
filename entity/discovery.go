@@ -19,6 +19,10 @@ type DiscoveryConfig struct {
 	UnitOfMeasurement         string `json:"unit_of_measurement,omitempty"`
 	SuggestedDisplayPrecision int    `json:"suggested_display_precision,omitempty"`
 
+	Min  float64 `json:"min,omitempty"`
+	Max  float64 `json:"max,omitempty"`
+	Step float64 `json:"step,omitempty"`
+
 	// https://developers.home-assistant.io/docs/core/entity/sensor/#available-state-classes
 	StateClass string `json:"state_class,omitempty"`
 	// https://www.home-assistant.io/integrations/sensor/#device-class
@@ -55,6 +59,9 @@ func (e *Entity) DiscoveryConfig() DiscoveryConfig {
 		EntityCategory:            e.config.Config.EntityCategory,
 		EntityPicture:             e.config.Config.EntityPicture,
 		UnitOfMeasurement:         e.config.Config.UnitOfMeasurement,
+		Min:                       e.config.Config.Min,
+		Max:                       e.config.Config.Max,
+		Step:                      e.config.Config.Step,
 		SuggestedDisplayPrecision: e.config.Config.SuggestedDisplayPrecision,
 		StateClass:                e.config.Config.StateClass,
 		DeviceClass:               e.config.Config.DeviceClass,

@@ -35,6 +35,7 @@ var (
 	DomainUpdate       = Domain{"update"}
 	DomainLock         = Domain{"lock"}
 	DomainImage        = Domain{"image"}
+	DomainNumber       = Domain{"number"}
 )
 
 type Config struct {
@@ -52,6 +53,10 @@ type Config struct {
 
 	UnitOfMeasurement         string `json:"unit_of_measurement,omitempty"`
 	SuggestedDisplayPrecision int    `json:"suggested_display_precision,omitempty"`
+
+	Min  float64 `json:"min,omitempty"`
+	Max  float64 `json:"max,omitempty"`
+	Step float64 `json:"step,omitempty"`
 
 	// https://developers.home-assistant.io/docs/core/entity/sensor/#available-state-classes
 	StateClass string `json:"state_class,omitempty"`
@@ -155,6 +160,27 @@ func (e *BuildConfig) Icon(icon string) *BuildConfig {
 
 func (e *BuildConfig) Unit(unit string) *BuildConfig {
 	e.Config.UnitOfMeasurement = unit
+	return e
+}
+
+func (e *BuildConfig) Min(min float64) *BuildConfig {
+	if e.Config.Min == 0 {
+		e.Config.Min = min
+	}
+	return e
+}
+
+func (e *BuildConfig) Max(max float64) *BuildConfig {
+	if e.Config.Max == 0 {
+		e.Config.Max = max
+	}
+	return e
+}
+
+func (e *BuildConfig) Step(step float64) *BuildConfig {
+	if e.Config.Step == 0 {
+		e.Config.Step = step
+	}
 	return e
 }
 
