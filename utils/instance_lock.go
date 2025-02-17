@@ -63,7 +63,20 @@ func (l InstanceLock) KillLockedPid() error {
 		return nil
 	}
 	if err != nil {
-		return err
+		// ignore errors as it's probably because the process is not ours
+		// can happen if the lock file is not cleaned up properly on shutdown
+		log.Warn().Err(err).Msg("failed to get locked process")
+		return nil
+	}
+
+	name, err := proc.Name()
+	if err != nil {
+		log.Warn().Err(err).Msg("failed to get locked process name")
+		return nil
+	}
+	if name != ExeName {
+		log.Warn().Str("name", name).Msg("locked process is not the same executable")
+		return nil
 	}
 
 	err = proc.Terminate()
