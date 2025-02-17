@@ -13,6 +13,8 @@ import (
 
 func NewUpdate(cfg entity.Config) *entity.Entity {
 	var lastState map[string]interface{}
+	loggedUpdate := false
+
 	return entity.NewEntity(cfg).
 		Type(entity.DomainUpdate).
 		ID("update").
@@ -47,6 +49,12 @@ func NewUpdate(cfg entity.Config) *entity.Entity {
 			}
 
 			log.Debug().Str("latest_version", latestVersion).Msg("latest version")
+
+			if !loggedUpdate && latestVersion != config.Version {
+				log.Info().Str("installed_version", config.Version).Str("latest_version", latestVersion).
+					Msg("update available")
+				loggedUpdate = true
+			}
 
 			lastState = map[string]interface{}{
 				"installed_version": config.Version,
