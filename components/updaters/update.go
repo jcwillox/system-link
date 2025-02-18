@@ -27,6 +27,7 @@ func NewUpdate(cfg entity.Config) *entity.Entity {
 					return
 				}
 				lastState["update_percentage"] = progress
+				lastState["in_progress"] = true
 				data, err := json.Marshal(lastState)
 				if err != nil {
 					return
@@ -61,6 +62,7 @@ func NewUpdate(cfg entity.Config) *entity.Entity {
 				"latest_version":    latestVersion,
 				"title":             "System Link",
 				"release_url":       config.RepoUrl + "/releases/tag/v" + latestVersion,
+				"in_progress":       false,
 			}
 			data, err := json.Marshal(lastState)
 			if err != nil {
