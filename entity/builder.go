@@ -390,6 +390,7 @@ func (e *BuildConfig) StartJob() *BuildConfig {
 				e.jobDefinition,
 				e.jobTask,
 				gocron.WithStartAt(gocron.WithStartImmediately()),
+				gocron.WithSingletonMode(gocron.LimitModeReschedule),
 			)
 			if err != nil {
 				return err
