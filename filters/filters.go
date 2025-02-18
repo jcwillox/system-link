@@ -101,7 +101,7 @@ func (f *ThrottleAvgFilter) Filter(state interface{}) (interface{}, error) {
 	if v, ok := state.(int); ok {
 		state = float64(v)
 	}
-	if v, ok := state.(float64); !ok {
+	if v, ok := state.(float64); ok {
 		f.sum += v
 		f.count++
 	} else {
