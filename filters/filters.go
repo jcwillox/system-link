@@ -2,14 +2,16 @@ package filters
 
 import (
 	"fmt"
+	"github.com/rs/zerolog/log"
 	"math"
 	"time"
 )
 
 type Filter struct {
-	*OrFilter       `yaml:",inline"`
-	*ThrottleFilter `yaml:",inline"`
-	*DeltaFilter    `yaml:",inline"`
+	*OrFilter          `yaml:",inline"`
+	*ThrottleFilter    `yaml:",inline"`
+	*ThrottleAvgFilter `yaml:",inline"`
+	*DeltaFilter       `yaml:",inline"`
 }
 
 type FilterI interface {
@@ -31,9 +33,9 @@ func (f *OrFilter) IsSet() bool {
 }
 
 func (f *OrFilter) Filter(state interface{}) (interface{}, error) {
-	filters := make([]FilterI, 0, len(f.Or)*3)
+	filters := make([]FilterI, 0, len(f.Or)*4)
 	for _, filter := range f.Or {
-		filters = append(filters, filter.OrFilter, filter.ThrottleFilter, filter.DeltaFilter)
+		filters = append(filters, filter.OrFilter, filter.ThrottleFilter, filter.ThrottleAvgFilter, filter.DeltaFilter)
 	}
 	// run through all filters
 	var err error
@@ -74,6 +76,52 @@ func (f *ThrottleFilter) Filter(state interface{}) (interface{}, error) {
 	// time we last allowed a state to pass
 	f.since = time.Now()
 	return state, nil
+}
+
+type ThrottleAvgFilter struct {
+	ThrottleAverage time.Duration `yaml:"throttle_average"`
+	since           time.Time
+	count           int
+	sum             float64
+}
+
+func (f *ThrottleAvgFilter) String() string {
+	return fmt.Sprintf(
+		"ThrottleAvgFilter{Throttle: %v, since: %v, sum: %v, count: %v}",
+		f.ThrottleAverage, f.since, f.sum, f.count,
+	)
+}
+
+func (f *ThrottleAvgFilter) IsSet() bool {
+	return f.ThrottleAverage > 0
+}
+
+func (f *ThrottleAvgFilter) Filter(state interface{}) (interface{}, error) {
+	// allow int or float64 states
+	if v, ok := state.(int); ok {
+		state = float64(v)
+	}
+	if v, ok := state.(float64); !ok {
+		f.sum += v
+		f.count++
+	} else {
+		log.Error().Msg("cannot use non-numeric state with throttle average filter")
+	}
+	// check if throttle has passed
+	if f.since.IsZero() {
+		f.since = time.Now()
+	}
+	if time.Since(f.since) < f.ThrottleAverage {
+		return nil, SkipSendErr
+	}
+	// time we last allowed a state to pass
+	f.since = time.Now()
+	f.count = 0
+	f.sum = 0
+	if f.count == 0 {
+		return state, nil
+	}
+	return f.sum / float64(f.count), nil
 }
 
 type DeltaFilter struct {

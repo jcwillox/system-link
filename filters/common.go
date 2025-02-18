@@ -11,9 +11,9 @@ type Filters struct {
 }
 
 func (f *Filters) Filter(state interface{}) (interface{}, error) {
-	filters := make([]FilterI, 0, len(f.Filters)*3)
+	filters := make([]FilterI, 0, len(f.Filters)*4)
 	for _, filter := range f.Filters {
-		filters = append(filters, filter.OrFilter, filter.ThrottleFilter, filter.DeltaFilter)
+		filters = append(filters, filter.OrFilter, filter.ThrottleFilter, filter.ThrottleAvgFilter, filter.DeltaFilter)
 	}
 	// run through all filters
 	var err error
