@@ -3,6 +3,7 @@ module github.com/jcwillox/system-link
 go 1.23
 
 require (
+	github.com/PaesslerAG/jsonpath v0.1.1
 	github.com/creasty/defaults v1.8.0
 	github.com/distatus/battery v0.11.0
 	github.com/eclipse/paho.mqtt.golang v1.5.0
@@ -10,7 +11,6 @@ require (
 	github.com/go-playground/validator/v10 v10.23.0
 	github.com/goccy/go-yaml v1.15.12
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510
-	github.com/google/uuid v1.6.0
 	github.com/kbinani/screenshot v0.0.0-20240820160931-a8a2c5d0e191
 	github.com/mattn/go-isatty v0.0.20
 	github.com/rs/zerolog v1.33.0
@@ -21,6 +21,7 @@ require (
 )
 
 require (
+	github.com/PaesslerAG/gval v1.0.0 // indirect
 	github.com/ebitengine/purego v0.8.1 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
 	github.com/gen2brain/shm v0.1.0 // indirect
@@ -28,6 +29,7 @@ require (
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/godbus/dbus/v5 v5.1.0 // indirect
+	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/jezek/xgb v1.1.1 // indirect
 	github.com/jonboulle/clockwork v0.4.0 // indirect
