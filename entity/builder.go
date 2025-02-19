@@ -91,8 +91,9 @@ type BuildConfig struct {
 	componentType Domain
 	objectID      string
 
-	stateTopic   string
-	commandTopic string
+	stateTopic      string
+	commandTopic    string
+	attributesTopic string
 
 	Config
 }
@@ -105,6 +106,18 @@ func (e *BuildConfig) DefaultStateTopic() *BuildConfig {
 		}
 
 		e.stateTopic = path.Join(config.Config.MQTT.BaseTopic, e.componentType.String(), config.Config.HostID, e.objectID, "state")
+	}
+	return e
+}
+
+func (e *BuildConfig) DefaultAttributesTopic() *BuildConfig {
+	if e.attributesTopic == "" {
+		if e.componentType == (Domain{}) || e.objectID == "" {
+			log.Fatal().Str("name", e.Config.Name).Stringer("type", e.componentType).
+				Str("object", e.objectID).Msg("component type and object id must be set for attributes topic")
+		}
+
+		e.attributesTopic = path.Join(config.Config.MQTT.BaseTopic, e.componentType.String(), config.Config.HostID, e.objectID, "attributes")
 	}
 	return e
 }

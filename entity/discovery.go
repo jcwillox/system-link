@@ -10,8 +10,7 @@ type DiscoveryConfig struct {
 	UniqueID         string `json:"unique_id,omitempty"`
 	EnabledByDefault *bool  `json:"enabled_by_default,omitempty"`
 
-	JsonAttributesTopic string `json:"json_attributes_topic,omitempty"`
-	ValueTemplate       string `json:"value_template,omitempty"`
+	ValueTemplate string `json:"value_template,omitempty"`
 
 	EntityCategory string `json:"entity_category,omitempty"`
 	EntityPicture  string `json:"entity_picture,omitempty"`
@@ -29,9 +28,10 @@ type DiscoveryConfig struct {
 	DeviceClass string   `json:"device_class,omitempty"`
 	Options     []string `json:"options,omitempty"`
 
-	StateTopic   string `json:"state_topic,omitempty"`
-	ImageTopic   string `json:"image_topic,omitempty"`
-	CommandTopic string `json:"command_topic,omitempty"`
+	StateTopic          string `json:"state_topic,omitempty"`
+	ImageTopic          string `json:"image_topic,omitempty"`
+	CommandTopic        string `json:"command_topic,omitempty"`
+	JsonAttributesTopic string `json:"json_attributes_topic,omitempty"`
 
 	PayloadOn      string `json:"payload_on,omitempty"`
 	PayloadOff     string `json:"payload_off,omitempty"`
@@ -54,7 +54,6 @@ func (e *Entity) DiscoveryConfig() DiscoveryConfig {
 		Icon:                      e.config.Config.Icon,
 		UniqueID:                  e.config.Config.UniqueID,
 		EnabledByDefault:          e.config.Config.EnabledByDefault,
-		JsonAttributesTopic:       e.config.Config.JsonAttributesTopic,
 		ValueTemplate:             e.config.Config.ValueTemplate,
 		EntityCategory:            e.config.Config.EntityCategory,
 		EntityPicture:             e.config.Config.EntityPicture,
@@ -65,8 +64,9 @@ func (e *Entity) DiscoveryConfig() DiscoveryConfig {
 		SuggestedDisplayPrecision: e.config.Config.SuggestedDisplayPrecision,
 		StateClass:                e.config.Config.StateClass,
 		DeviceClass:               e.config.Config.DeviceClass,
-		StateTopic:                e.StateTopic(),
-		CommandTopic:              e.CommandTopic(),
+		StateTopic:                e.config.stateTopic,
+		CommandTopic:              e.config.commandTopic,
+		JsonAttributesTopic:       e.config.attributesTopic,
 		PayloadOn:                 e.config.Config.PayloadOn,
 		PayloadOff:                e.config.Config.PayloadOff,
 		PayloadInstall:            e.config.Config.PayloadInstall,

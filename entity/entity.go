@@ -1,6 +1,7 @@
 package entity
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
@@ -86,6 +87,26 @@ func (e *Entity) PublishState(client mqtt.Client, state interface{}) error {
 	return e.PublishRawState(client, fmt.Sprint(state))
 }
 
+func (e *Entity) PublishAttributes(client mqtt.Client, attributes interface{}) error {
+	if e.config.attributesTopic == "" {
+		log.Warn().Interface("attributes", attributes).Msg("publish failed as entity does not have an attributes topic")
+		return nil
+	}
+
+	data, err := json.Marshal(attributes)
+	if err != nil {
+		return err
+	}
+
+	token := client.Publish(e.config.attributesTopic, 0, true, data)
+	if token.Wait() && token.Error() != nil {
+		log.Err(token.Error()).Caller().Msg("failed publishing attributes")
+		return token.Error()
+	}
+
+	return nil
+}
+
 func (e *Entity) PublishRawState(client mqtt.Client, state interface{}) error {
 	if e.config.stateTopic == "" {
 		log.Warn().Interface("state", state).Msg("publish failed as entity does not have a state topic")
@@ -108,12 +129,6 @@ func (e *Entity) OnCleanup(fn SetupFn) *Entity {
 
 func (e *Entity) Name() string {
 	return e.config.Config.Name
-}
-func (e *Entity) StateTopic() string {
-	return e.config.stateTopic
-}
-func (e *Entity) CommandTopic() string {
-	return e.config.commandTopic
 }
 
 /* INTERNAL AGGREGATE FUNCTIONS */
