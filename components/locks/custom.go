@@ -21,12 +21,12 @@ func NewCustom(cfg CustomConfig) *entity.Entity {
 		ObjectID(cfg.UniqueID).
 		OnState(func(entity *entity.Entity, client mqtt.Client, scheduler gocron.Scheduler, message mqtt.Message) {
 			if string(message.Payload()) == "LOCKED" {
-				err, _ := utils.RunCommand(cfg.Lock.Command, cfg.Lock.Shell, cfg.Lock.Hidden, cfg.Lock.ShowErrors, cfg.Lock.Detached)
+				_, err := utils.RunCommand(cfg.Lock)
 				if err != nil {
 					log.Err(err).Str("command", cfg.Lock.Command).Msg("failed to run command")
 				}
 			} else if string(message.Payload()) == "UNLOCKED" {
-				err, _ := utils.RunCommand(cfg.Unlock.Command, cfg.Unlock.Shell, cfg.Unlock.Hidden, cfg.Unlock.ShowErrors, cfg.Unlock.Detached)
+				_, err := utils.RunCommand(cfg.Unlock)
 				if err != nil {
 					log.Err(err).Str("command", cfg.Unlock.Command).Msg("failed to run command")
 				}

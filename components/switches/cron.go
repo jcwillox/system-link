@@ -75,36 +75,39 @@ func NewCron(cfg CronConfig) []*entity.Entity {
 			start := time.Now()
 
 			// run command
-			err, code := utils.RunCommand(cfg.Command, cfg.Shell, cfg.Hidden, cfg.ShowErrors, cfg.Detached)
+			res, err := utils.RunCommand(cfg.CommandConfig)
 
 			if durationEntity != nil {
-				err = durationEntity.PublishState(client, time.Since(start).Seconds())
+				err := durationEntity.PublishState(client, time.Since(start).Seconds())
 				if err != nil {
 					return err
 				}
 			}
 
-			if exitCodeEntity != nil && code >= 0 {
-				err = exitCodeEntity.PublishState(client, code)
+			if exitCodeEntity != nil && res.Code >= 0 {
+				err := exitCodeEntity.PublishState(client, res.Code)
 				if err != nil {
 					return err
 				}
 			}
 
-			if err != nil {
-				log.Err(err).Str("command", cfg.CommandConfig.Command).Msg("failed to run command")
+			if err != nil || res.Code > 0 {
 				if successEntity != nil {
-					err = successEntity.PublishState(client, "ON")
+					err := successEntity.PublishState(client, "ON")
 					if err != nil {
 						return err
 					}
 				}
-			}
-
-			if successEntity != nil {
-				err = successEntity.PublishState(client, "OFF")
 				if err != nil {
+					log.Err(err).Str("command", cfg.CommandConfig.Command).Msg("failed to run command")
 					return err
+				}
+			} else {
+				if successEntity != nil {
+					err := successEntity.PublishState(client, "OFF")
+					if err != nil {
+						return err
+					}
 				}
 			}
 

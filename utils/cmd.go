@@ -8,6 +8,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"golang.org/x/sys/execabs"
 	"html/template"
+	"os/exec"
 	"runtime"
 )
 
@@ -16,8 +17,15 @@ type CommandConfig struct {
 	Hidden     *bool  `json:"hidden"`
 	Shell      string `json:"shell"`
 	ShowErrors bool   `json:"show_errors"`
+	ShowOutput bool   `json:"show_output"`
 	// Don't wait for the command to finish
 	Detached bool `json:"detached"`
+}
+
+type CommandResult struct {
+	Stdout []byte
+	Stderr []byte
+	Code   int
 }
 
 func GetDefaultShell() []string {
@@ -65,58 +73,75 @@ func renderTemplate(command string) (string, error) {
 	return tpl.String(), nil
 }
 
-func RunCommand(command string, shell string, hidden *bool, showErrors bool, detached bool) (error, int) {
+// RunCommand runs a specified command, if Detached is true the command result will be empty
+func RunCommand(cfg CommandConfig) (CommandResult, error) {
 	var args []string
-	var err error
 
-	log.Info().Str("command", command).Str("shell", shell).
-		Interface("hidden", hidden).Msg("running command")
+	log.Info().Str("command", cfg.Command).Str("shell", cfg.Shell).
+		Interface("hidden", cfg.Hidden).Msg("running command")
 
-	command, err = renderTemplate(command)
+	command, err := renderTemplate(cfg.Command)
 	if err != nil {
-		return err, -1
+		return CommandResult{}, err
 	}
 
 	log.Info().Str("command", command).Msg("templated command")
 
-	if shell == "none" {
+	if cfg.Shell == "none" {
 		cmdArgs, err := shlex.Split(command)
 		if err != nil {
-			return fmt.Errorf("failed to parse command: %s; %w", command, err), -1
+			return CommandResult{}, fmt.Errorf("failed to parse command: %s; %w", command, err)
 		}
 		args = cmdArgs
 	} else {
-		shellCmd := getShell(shell)
+		shellCmd := getShell(cfg.Shell)
 		args = append(shellCmd, command)
 	}
 
 	cmd := execabs.Command(args[0], args[1:]...)
 
-	if hidden == nil || *hidden {
+	if cfg.Hidden == nil || *cfg.Hidden {
 		makeCmdHidden(cmd)
 	}
 
-	if detached {
+	if cfg.Detached {
 		if err := cmd.Start(); err != nil {
-			return fmt.Errorf("failed to start command: %s; %w", command, err), -1
+			return CommandResult{}, fmt.Errorf("failed to start command: %s; %w", command, err)
 		}
 		err := cmd.Process.Release()
 		if err != nil {
-			return err, -1
+			return CommandResult{}, err
 		}
-		return nil, 0
+		return CommandResult{}, nil
 	}
 
-	output, err := cmd.CombinedOutput()
-	var exitErr *execabs.ExitError
-	if errors.As(err, &exitErr) {
-		if showErrors {
-			log.Err(err).Int("exit", exitErr.ExitCode()).Str("output", string(output)).Msg("command failed")
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+
+	err = cmd.Run()
+
+	res := CommandResult{
+		Stdout: stdout.Bytes(),
+		Stderr: stderr.Bytes(),
+		Code:   0,
+	}
+
+	var ee *exec.ExitError
+	if errors.As(err, &ee) {
+		res.Code = ee.ExitCode()
+
+		if cfg.ShowErrors {
+			log.Err(err).Int("exit", ee.ExitCode()).Str("stdout", string(res.Stdout)).Str("stderr", string(res.Stderr)).Msg("command failed")
 		}
-		return nil, exitErr.ExitCode()
+
+		return res, nil
 	}
-	if err != nil {
-		return err, -1
+
+	if cfg.ShowOutput {
+		log.Info().Str("stdout", string(res.Stdout)).Str("stderr", string(res.Stderr)).Msg("command output")
 	}
-	return nil, 0
+
+	return res, err
 }
