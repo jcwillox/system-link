@@ -65,7 +65,7 @@ func renderTemplate(command string) (string, error) {
 	return tpl.String(), nil
 }
 
-func RunCommand(command string, shell string, hidden *bool, showErrors bool, detached bool) error {
+func RunCommand(command string, shell string, hidden *bool, showErrors bool, detached bool) (error, int) {
 	var args []string
 	var err error
 
@@ -74,7 +74,7 @@ func RunCommand(command string, shell string, hidden *bool, showErrors bool, det
 
 	command, err = renderTemplate(command)
 	if err != nil {
-		return err
+		return err, -1
 	}
 
 	log.Info().Str("command", command).Msg("templated command")
@@ -82,7 +82,7 @@ func RunCommand(command string, shell string, hidden *bool, showErrors bool, det
 	if shell == "none" {
 		cmdArgs, err := shlex.Split(command)
 		if err != nil {
-			return fmt.Errorf("failed to parse command: %s; %w", command, err)
+			return fmt.Errorf("failed to parse command: %s; %w", command, err), -1
 		}
 		args = cmdArgs
 	} else {
@@ -98,13 +98,13 @@ func RunCommand(command string, shell string, hidden *bool, showErrors bool, det
 
 	if detached {
 		if err := cmd.Start(); err != nil {
-			return fmt.Errorf("failed to start command: %s; %w", command, err)
+			return fmt.Errorf("failed to start command: %s; %w", command, err), -1
 		}
 		err := cmd.Process.Release()
 		if err != nil {
-			return err
+			return err, -1
 		}
-		return nil
+		return nil, 0
 	}
 
 	output, err := cmd.CombinedOutput()
@@ -113,7 +113,10 @@ func RunCommand(command string, shell string, hidden *bool, showErrors bool, det
 		if showErrors {
 			log.Err(err).Int("exit", exitErr.ExitCode()).Str("output", string(output)).Msg("command failed")
 		}
-		return nil
+		return nil, exitErr.ExitCode()
 	}
-	return err
+	if err != nil {
+		return err, -1
+	}
+	return nil, 0
 }
