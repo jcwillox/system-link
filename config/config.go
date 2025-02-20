@@ -10,6 +10,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 	"sync"
 )
 
@@ -52,6 +53,14 @@ type CoreConfig struct {
 
 func (c *CoreConfig) AvailabilityTopic() string {
 	return path.Join(Config.MQTT.BaseTopic, Config.HostID, "availability")
+}
+
+func LogsPath() string {
+	name := strings.TrimSuffix(utils.ExeName, ".exe") + ".log"
+	if env := os.Getenv("SYSTEM_LINK_LOGS_DIR"); env != "" {
+		return filepath.Join(env, name)
+	}
+	return filepath.Join(utils.ExeDirectory, name)
 }
 
 func LoadConfig() {

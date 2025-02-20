@@ -3,12 +3,12 @@ package config
 import (
 	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
-	"github.com/jcwillox/system-link/utils"
 	"github.com/mattn/go-isatty"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"gopkg.in/natefinch/lumberjack.v2"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 )
@@ -33,9 +33,12 @@ func SetupLogging() {
 		NoColor:    !colored,
 	}
 
+	path := LogsPath()
+	_ = os.MkdirAll(filepath.Dir(path), os.ModePerm)
+
 	fileWriter := zerolog.ConsoleWriter{
 		Out: &lumberjack.Logger{
-			Filename:   strings.TrimSuffix(utils.ExePath, ".exe") + ".log",
+			Filename:   path,
 			MaxSize:    1,
 			MaxBackups: 3,
 		},
