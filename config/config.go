@@ -10,6 +10,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"sync"
 )
 
 var (
@@ -17,6 +18,19 @@ var (
 	Version         string
 	Config          CoreConfig
 	ShutdownChannel = make(chan bool)
+	Path            = sync.OnceValue(func() string {
+		// attempt to load from exe directory first
+		configPath := filepath.Join(utils.ExeDirectory, "config.yaml")
+		if _, err := os.Stat(configPath); err == nil {
+			return configPath
+		}
+		// try load from env path
+		if env := os.Getenv("SYSTEM_LINK_CONFIG"); env != "" {
+			return env
+		}
+		// fallback to exe directory
+		return configPath
+	})
 )
 
 type CoreConfig struct {
@@ -40,13 +54,6 @@ func (c *CoreConfig) AvailabilityTopic() string {
 	return path.Join(Config.MQTT.BaseTopic, Config.HostID, "availability")
 }
 
-func Path() string {
-	if env := os.Getenv("SYSTEM_LINK_CONFIG"); env != "" {
-		return env
-	}
-	return filepath.Join(utils.ExeDirectory, "config.yaml")
-}
-
 func LoadConfig() {
 	// set defaults
 	err := defaults.Set(&Config)
@@ -57,7 +64,7 @@ func LoadConfig() {
 	// load config
 	data, err := os.ReadFile(Path())
 	if err != nil {
-		log.Fatal().Err(err).Msg("fatal error reading config")
+		log.Fatal().Err(err).Str("path", Path()).Msg("fatal error reading config")
 	}
 
 	validate := validator.New()
