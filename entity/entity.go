@@ -63,7 +63,7 @@ func (e *Entity) RunJob() error {
 		return e.config.job.RunNow()
 	}
 	// otherwise invoke it directly
-	e.config.jobTask()
+	e.config.jobFn()
 	return nil
 }
 

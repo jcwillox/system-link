@@ -87,6 +87,7 @@ type BuildConfig struct {
 	job           gocron.Job
 	jobDefinition gocron.JobDefinition
 	jobTask       gocron.Task
+	jobFn         func()
 
 	componentType Domain
 	objectID      string
@@ -365,8 +366,7 @@ func (e *BuildConfig) ScheduleJob(jobDefinition gocron.JobDefinition, handler Se
 				log.Warn().Str("name", e.Config.Name).Msg("entity can only have one job definition")
 			}
 
-			e.jobDefinition = jobDefinition
-			e.jobTask = gocron.NewTask(func() {
+			e.jobFn = func() {
 				start := time.Now()
 
 				err := handler(entity, client, scheduler)
@@ -377,7 +377,9 @@ func (e *BuildConfig) ScheduleJob(jobDefinition gocron.JobDefinition, handler Se
 				if err != nil {
 					log.Err(err).Str("name", e.Config.Name).Msg("failed to update")
 				}
-			})
+			}
+			e.jobTask = gocron.NewTask(e.jobFn)
+			e.jobDefinition = jobDefinition
 
 			return nil
 		}).
@@ -389,8 +391,9 @@ func (e *BuildConfig) ScheduleJob(jobDefinition gocron.JobDefinition, handler Se
 				}
 				e.job = nil
 			}
-			e.jobDefinition = nil
+			e.jobFn = nil
 			e.jobTask = nil
+			e.jobDefinition = nil
 			return nil
 		})
 	return e
