@@ -8,18 +8,19 @@ import (
 	"github.com/rs/zerolog/log"
 	"golang.org/x/sys/execabs"
 	"html/template"
+	"os"
 	"os/exec"
 	"runtime"
 )
 
 type CommandConfig struct {
-	Command    string `json:"command" validate:"required"`
-	Hidden     *bool  `json:"hidden"`
-	Shell      string `json:"shell"`
-	ShowErrors bool   `json:"show_errors"`
-	ShowOutput bool   `json:"show_output"`
-	// Don't wait for the command to finish
-	Detached bool `json:"detached"`
+	Command    string            `json:"command" validate:"required"`
+	Hidden     *bool             `json:"hidden"`
+	Shell      string            `json:"shell"`
+	ShowErrors bool              `json:"show_errors"`
+	ShowOutput bool              `json:"show_output"`
+	Detached   bool              `json:"detached"`
+	Env        map[string]string `json:"env"`
 }
 
 type CommandResult struct {
@@ -73,7 +74,8 @@ func renderTemplate(command string) (string, error) {
 	return tpl.String(), nil
 }
 
-// RunCommand runs a specified command, if Detached is true the command result will be empty
+// RunCommand runs a specified command,
+// if Detached is true the command result will be empty
 func RunCommand(cfg CommandConfig) (CommandResult, error) {
 	var args []string
 
@@ -99,6 +101,13 @@ func RunCommand(cfg CommandConfig) (CommandResult, error) {
 	}
 
 	cmd := execabs.Command(args[0], args[1:]...)
+
+	if len(cfg.Env) > 0 {
+		cmd.Env = os.Environ()
+		for k, v := range cfg.Env {
+			cmd.Env = append(cmd.Env, k+"="+v)
+		}
+	}
 
 	if cfg.Hidden == nil || *cfg.Hidden {
 		makeCmdHidden(cmd)
