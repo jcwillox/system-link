@@ -48,12 +48,13 @@ nfpms:
 
 dockers:
   - image_templates:
-      - "ghcr.io/jcwillox/{{ .ProjectName }}:{{ .Tag }}"
-      - "ghcr.io/jcwillox/{{ .ProjectName }}:v{{ .Major }}"
+      - "ghcr.io/jcwillox/{{ .ProjectName }}:{{ .Version }}"
+      - "ghcr.io/jcwillox/{{ .ProjectName }}:{{ .Major }}"
+      - "ghcr.io/jcwillox/{{ .ProjectName }}:{{ .Major }}.{{ .Minor }}"
       - "ghcr.io/jcwillox/{{ .ProjectName }}:latest"
     goarch: amd64
     goos: linux
-    build_flag_templates:
+    build_flag_templates: &build_flags
       - --platform=linux/amd64
       - --label=org.opencontainers.image.title={{ .ProjectName }}
       - --label=org.opencontainers.image.url=https://github.com/jcwillox/{{ .ProjectName }}
@@ -63,6 +64,15 @@ dockers:
       - --label=org.opencontainers.image.created={{ time "2006-01-02T15:04:05Z07:00" }}
       - --label=org.opencontainers.image.revision={{ .FullCommit }}
       - --label=org.opencontainers.image.licenses=MIT
+  - image_templates:
+      - "ghcr.io/jcwillox/{{ .ProjectName }}:{{ .Version }}-python3.13-alpine"
+      - "ghcr.io/jcwillox/{{ .ProjectName }}:{{ .Major }}-python3.13-alpine"
+      - "ghcr.io/jcwillox/{{ .ProjectName }}:{{ .Major }}.{{ .Minor }}-python3.13-alpine"
+      - "ghcr.io/jcwillox/{{ .ProjectName }}:python3.13-alpine"
+    goarch: amd64
+    goos: linux
+    build_flag_templates: *build_flags
+    dockerfile: Dockerfile-python
 
 checksum:
   name_template: 'checksums.txt'
