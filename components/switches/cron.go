@@ -41,7 +41,8 @@ func NewCron(cfg CronConfig) []*entity.Entity {
 			Name(cfg.Name + " Successful").
 			ID(cfg.UniqueID + "_successful").
 			DeviceClass("problem").
-			DefaultStateTopic().Build()
+			DefaultStateTopic().
+			DefaultAttributesTopic().Build()
 		entities = append(entities, successEntity)
 	}
 
@@ -71,7 +72,6 @@ func NewCron(cfg CronConfig) []*entity.Entity {
 		Type(entity.DomainSwitch).
 		ObjectID(cfg.UniqueID).
 		ScheduleJob(gocron.CronJob(cfg.Schedule, true), func(entity *entity.Entity, client mqtt.Client, scheduler gocron.Scheduler) error {
-			log.Debug().Str("command", cfg.CommandConfig.Command).Msg("running command task")
 			start := time.Now()
 
 			// run command
@@ -97,6 +97,14 @@ func NewCron(cfg CronConfig) []*entity.Entity {
 					if err != nil {
 						return err
 					}
+					err = successEntity.PublishAttributes(client, map[string]interface{}{
+						"stdout": string(res.Stdout),
+						"stderr": string(res.Stderr),
+						"code":   res.Code,
+					})
+					if err != nil {
+						return err
+					}
 				}
 				if err != nil {
 					log.Err(err).Str("command", cfg.CommandConfig.Command).Msg("failed to run command")
@@ -105,6 +113,10 @@ func NewCron(cfg CronConfig) []*entity.Entity {
 			} else {
 				if successEntity != nil {
 					err := successEntity.PublishState(client, "OFF")
+					if err != nil {
+						return err
+					}
+					err = successEntity.PublishAttributes(client, map[string]string{})
 					if err != nil {
 						return err
 					}

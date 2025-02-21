@@ -24,9 +24,9 @@ type CommandConfig struct {
 }
 
 type CommandResult struct {
-	Stdout []byte
-	Stderr []byte
-	Code   int
+	Stdout []byte `json:"stdout"`
+	Stderr []byte `json:"stderr"`
+	Code   int    `json:"code"`
 }
 
 func GetDefaultShell() []string {
@@ -79,7 +79,7 @@ func renderTemplate(command string) (string, error) {
 func RunCommand(cfg CommandConfig) (CommandResult, error) {
 	var args []string
 
-	log.Info().Str("command", cfg.Command).Str("shell", cfg.Shell).
+	log.Debug().Str("command", cfg.Command).Str("shell", cfg.Shell).
 		Interface("hidden", cfg.Hidden).Msg("running command")
 
 	command, err := renderTemplate(cfg.Command)
@@ -87,7 +87,7 @@ func RunCommand(cfg CommandConfig) (CommandResult, error) {
 		return CommandResult{}, err
 	}
 
-	log.Info().Str("command", command).Msg("templated command")
+	log.Debug().Str("command", command).Msg("templated command")
 
 	if cfg.Shell == "none" {
 		cmdArgs, err := shlex.Split(command)
