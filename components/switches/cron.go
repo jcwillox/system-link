@@ -46,7 +46,7 @@ func NewCron(cfg CronConfig) []*entity.Entity {
 	}
 
 	if cfg.Entities.Duration != nil {
-		durationEntity = entity.NewEntity(*cfg.Entities.ExitCode).
+		durationEntity = entity.NewEntity(*cfg.Entities.Duration).
 			Type(entity.DomainSensor).
 			Name(cfg.Name + " Duration").
 			ID(cfg.UniqueID + "_duration").
