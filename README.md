@@ -114,6 +114,10 @@ sensors:
   - disk_used: {}
   - disk_free: {}
 
+  - zpool: {}
+  - zpool_used: {}
+  - zpool_free: {}
+
   - uptime: {}
 
   - battery: {}
