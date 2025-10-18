@@ -7,6 +7,8 @@ import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/go-co-op/gocron/v2"
 	"github.com/jcwillox/system-link/entity"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 type ZpoolConfig struct {
@@ -15,57 +17,33 @@ type ZpoolConfig struct {
 }
 
 type zpoolListOutput struct {
-	Pools []zpoolInfo `json:"pools"`
+	Pools map[string]zpoolData `json:"pools"`
 }
 
-type zpoolInfo struct {
-	Name      string `json:"name"`
-	Size      uint64 `json:"size"`
-	Allocated uint64 `json:"allocated"`
-	Free      uint64 `json:"free"`
+type zpoolData struct {
+	Name       string              `json:"name"`
+	Properties zpoolDataProperties `json:"properties"`
 }
 
-func getZpoolNames(pools *[]string) ([]string, error) {
-	if pools != nil {
-		return *pools, nil
-	}
-
-	cmd := exec.Command("zpool", "list", "-H", "-o", "name")
-	output, err := cmd.Output()
-	if err != nil {
-		return nil, err
-	}
-
-	var poolNames []string
-	lines := string(output)
-	if lines != "" {
-		// Split by newlines and filter empty lines
-		for _, line := range splitLines(lines) {
-			if line != "" {
-				poolNames = append(poolNames, line)
-			}
-		}
-	}
-	return poolNames, nil
+type zpoolDataProperties struct {
+	Size      zpoolProperty `json:"size"`
+	Allocated zpoolProperty `json:"allocated"`
+	Free      zpoolProperty `json:"free"`
 }
 
-func splitLines(s string) []string {
-	var lines []string
-	start := 0
-	for i := 0; i < len(s); i++ {
-		if s[i] == '\n' {
-			lines = append(lines, s[start:i])
-			start = i + 1
-		}
-	}
-	if start < len(s) {
-		lines = append(lines, s[start:])
-	}
-	return lines
+type zpoolProperty struct {
+	Value uint64 `json:"value"`
 }
 
-func getZpoolInfo(poolName string) (*zpoolInfo, error) {
-	cmd := exec.Command("zpool", "list", "-j", "--json-int", poolName)
+func getZpoolInfo(poolNames *[]string) (map[string]zpoolDataProperties, error) {
+	var args []string
+	if poolNames != nil {
+		args = append([]string{"list", "-j", "--json-int"}, *poolNames...)
+	} else {
+		args = []string{"list", "-j", "--json-int"}
+	}
+
+	cmd := exec.Command("zpool", args...)
 	output, err := cmd.Output()
 	if err != nil {
 		return nil, err
@@ -76,40 +54,43 @@ func getZpoolInfo(poolName string) (*zpoolInfo, error) {
 		return nil, err
 	}
 
-	if len(zpoolData.Pools) == 0 {
-		return nil, nil
+	result := make(map[string]zpoolDataProperties)
+	for name, pool := range zpoolData.Pools {
+		result[name] = pool.Properties
 	}
 
-	return &zpoolData.Pools[0], nil
+	return result, nil
 }
 
 func NewZpool(cfg ZpoolConfig) []*entity.Entity {
 	var entities []*entity.Entity
 
-	poolNames, err := getZpoolNames(cfg.Pools)
+	poolsInfo, err := getZpoolInfo(cfg.Pools)
 	if err != nil {
 		return entities
 	}
 
-	for _, poolName := range poolNames {
+	for poolName := range poolsInfo {
 		pool := poolName // capture for closure
+		titleCaser := cases.Title(language.English)
 		newEntity := entity.NewEntity(cfg.Config).
 			Type(entity.DomainSensor).
 			ID("zpool_" + pool).
-			Name(pool).
-			Icon("mdi:database").
+			Name(titleCaser.String(pool)).
+			Icon("mdi:harddisk").
 			StateClass("measurement").
 			Unit("%").
 			Precision(1).
 			Schedule(func(e *entity.Entity, client mqtt.Client, scheduler gocron.Scheduler) error {
-				info, err := getZpoolInfo(pool)
+				poolsInfo, err := getZpoolInfo(cfg.Pools)
 				if err != nil {
 					return err
 				}
-				if info == nil {
+				props, ok := poolsInfo[pool]
+				if !ok {
 					return nil
 				}
-				usedPercent := float64(info.Allocated) / float64(info.Size) * 100
+				usedPercent := float64(props.Allocated.Value) / float64(props.Size.Value) * 100
 				return e.PublishState(client, usedPercent)
 			}).Build()
 		entities = append(entities, newEntity)
@@ -121,31 +102,33 @@ func NewZpool(cfg ZpoolConfig) []*entity.Entity {
 func NewZpoolUsed(cfg ZpoolConfig) []*entity.Entity {
 	var entities []*entity.Entity
 
-	poolNames, err := getZpoolNames(cfg.Pools)
+	poolsInfo, err := getZpoolInfo(cfg.Pools)
 	if err != nil {
 		return entities
 	}
 
-	for _, poolName := range poolNames {
+	for poolName := range poolsInfo {
 		pool := poolName // capture for closure
+		titleCaser := cases.Title(language.English)
 		newEntity := entity.NewEntity(cfg.Config).
 			Type(entity.DomainSensor).
 			ID("zpool_used_" + pool).
-			Name(pool + " Used").
-			Icon("mdi:database").
+			Name(titleCaser.String(pool) + " Used").
+			Icon("mdi:harddisk").
 			StateClass("measurement").
 			DeviceClass("data_size").
 			Unit("GiB").
 			Precision(1).
 			Schedule(func(e *entity.Entity, client mqtt.Client, scheduler gocron.Scheduler) error {
-				info, err := getZpoolInfo(pool)
+				poolsInfo, err := getZpoolInfo(cfg.Pools)
 				if err != nil {
 					return err
 				}
-				if info == nil {
+				props, ok := poolsInfo[pool]
+				if !ok {
 					return nil
 				}
-				return e.PublishState(client, float64(info.Allocated)/Gibibyte)
+				return e.PublishState(client, float64(props.Allocated.Value)/Gibibyte)
 			}).Build()
 		entities = append(entities, newEntity)
 	}
@@ -156,31 +139,33 @@ func NewZpoolUsed(cfg ZpoolConfig) []*entity.Entity {
 func NewZpoolFree(cfg ZpoolConfig) []*entity.Entity {
 	var entities []*entity.Entity
 
-	poolNames, err := getZpoolNames(cfg.Pools)
+	poolsInfo, err := getZpoolInfo(cfg.Pools)
 	if err != nil {
 		return entities
 	}
 
-	for _, poolName := range poolNames {
+	for poolName := range poolsInfo {
 		pool := poolName // capture for closure
+		titleCaser := cases.Title(language.English)
 		newEntity := entity.NewEntity(cfg.Config).
 			Type(entity.DomainSensor).
 			ID("zpool_free_" + pool).
-			Name(pool + " Free").
-			Icon("mdi:database").
+			Name(titleCaser.String(pool) + " Free").
+			Icon("mdi:harddisk").
 			StateClass("measurement").
 			DeviceClass("data_size").
 			Unit("GiB").
 			Precision(1).
 			Schedule(func(e *entity.Entity, client mqtt.Client, scheduler gocron.Scheduler) error {
-				info, err := getZpoolInfo(pool)
+				poolsInfo, err := getZpoolInfo(cfg.Pools)
 				if err != nil {
 					return err
 				}
-				if info == nil {
+				props, ok := poolsInfo[pool]
+				if !ok {
 					return nil
 				}
-				return e.PublishState(client, float64(info.Free)/Gibibyte)
+				return e.PublishState(client, float64(props.Free.Value)/Gibibyte)
 			}).Build()
 		entities = append(entities, newEntity)
 	}
