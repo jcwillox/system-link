@@ -17,6 +17,10 @@ type Config struct {
 	MemoryUsed *entity.Config `yaml:"memory_used,omitempty"`
 	MemoryFree *entity.Config `yaml:"memory_free,omitempty"`
 
+	Zpool     *ZpoolConfig `yaml:"zpool,omitempty"`
+	ZpoolUsed *ZpoolConfig `yaml:"zpool_used,omitempty"`
+	ZpoolFree *ZpoolConfig `yaml:"zpool_free,omitempty"`
+
 	Swap     *entity.Config `yaml:"swap,omitempty"`
 	SwapUsed *entity.Config `yaml:"swap_used,omitempty"`
 	SwapFree *entity.Config `yaml:"swap_free,omitempty"`
@@ -46,6 +50,16 @@ func (c *Config) LoadEntities() []*entity.Entity {
 	}
 	if c.DiskFree != nil {
 		entities = append(entities, NewDiskFree(*c.DiskFree)...)
+	}
+
+	if c.Zpool != nil {
+		entities = append(entities, NewZpool(*c.Zpool)...)
+	}
+	if c.ZpoolUsed != nil {
+		entities = append(entities, NewZpoolUsed(*c.ZpoolUsed)...)
+	}
+	if c.ZpoolFree != nil {
+		entities = append(entities, NewZpoolFree(*c.ZpoolFree)...)
 	}
 
 	if c.Memory != nil {
