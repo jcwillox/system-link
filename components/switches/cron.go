@@ -149,8 +149,8 @@ func NewCron(cfg CronConfig) []*entity.Entity {
 
 			// Update last run timestamp
 			if lastRunEntity != nil {
-				if entity.Job() != nil {
-					lastRun, err := entity.Job().LastRun()
+				if job := entity.Job(); job != nil {
+					lastRun, err := job.LastRun()
 					if err == nil {
 						err = lastRunEntity.PublishState(client, lastRun.Format(time.RFC3339))
 						if err != nil {
@@ -162,8 +162,8 @@ func NewCron(cfg CronConfig) []*entity.Entity {
 
 			// Update next run timestamp
 			if nextRunEntity != nil {
-				if entity.Job() != nil {
-					nextRun, err := entity.Job().NextRun()
+				if job := entity.Job(); job != nil {
+					nextRun, err := job.NextRun()
 					if err == nil {
 						err = nextRunEntity.PublishState(client, nextRun.Format(time.RFC3339))
 						if err != nil {
