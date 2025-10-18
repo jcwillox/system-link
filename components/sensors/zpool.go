@@ -70,13 +70,11 @@ func NewZpool(cfg ZpoolConfig) []*entity.Entity {
 		return entities
 	}
 
-	for poolName := range poolsInfo {
-		pool := poolName // capture for closure
-		titleCaser := cases.Title(language.English)
+	for pool := range poolsInfo {
 		newEntity := entity.NewEntity(cfg.Config).
 			Type(entity.DomainSensor).
 			ID("zpool_" + pool).
-			Name(titleCaser.String(pool)).
+			Name(cases.Title(language.English).String(pool)).
 			Icon("mdi:harddisk").
 			StateClass("measurement").
 			Unit("%").
@@ -107,13 +105,11 @@ func NewZpoolUsed(cfg ZpoolConfig) []*entity.Entity {
 		return entities
 	}
 
-	for poolName := range poolsInfo {
-		pool := poolName // capture for closure
-		titleCaser := cases.Title(language.English)
+	for pool := range poolsInfo {
 		newEntity := entity.NewEntity(cfg.Config).
 			Type(entity.DomainSensor).
 			ID("zpool_used_" + pool).
-			Name(titleCaser.String(pool) + " Used").
+			Name(cases.Title(language.English).String(pool) + " Used").
 			Icon("mdi:harddisk").
 			StateClass("measurement").
 			DeviceClass("data_size").
@@ -144,13 +140,11 @@ func NewZpoolFree(cfg ZpoolConfig) []*entity.Entity {
 		return entities
 	}
 
-	for poolName := range poolsInfo {
-		pool := poolName // capture for closure
-		titleCaser := cases.Title(language.English)
+	for pool := range poolsInfo {
 		newEntity := entity.NewEntity(cfg.Config).
 			Type(entity.DomainSensor).
 			ID("zpool_free_" + pool).
-			Name(titleCaser.String(pool) + " Free").
+			Name(cases.Title(language.English).String(pool) + " Free").
 			Icon("mdi:harddisk").
 			StateClass("measurement").
 			DeviceClass("data_size").
