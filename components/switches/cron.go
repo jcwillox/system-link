@@ -14,6 +14,8 @@ type CronEntities struct {
 	ExitCode   *entity.Config `yaml:"exit_code,omitempty"`
 	Duration   *entity.Config `yaml:"duration,omitempty"`
 	Run        *entity.Config `yaml:"run,omitempty"`
+	NextRun    *entity.Config `yaml:"next_run,omitempty"`
+	LastRun    *entity.Config `yaml:"last_run,omitempty"`
 }
 
 type CronConfig struct {
@@ -32,6 +34,8 @@ func NewCron(cfg CronConfig) []*entity.Entity {
 		successEntity  *entity.Entity
 		durationEntity *entity.Entity
 		exitCodeEntity *entity.Entity
+		nextRunEntity  *entity.Entity
+		lastRunEntity  *entity.Entity
 		entities       []*entity.Entity
 	)
 
@@ -66,6 +70,26 @@ func NewCron(cfg CronConfig) []*entity.Entity {
 			ID(cfg.UniqueID + "_exit_code").
 			DefaultStateTopic().Build()
 		entities = append(entities, exitCodeEntity)
+	}
+
+	if cfg.Entities.NextRun != nil {
+		nextRunEntity = entity.NewEntity(*cfg.Entities.NextRun).
+			Type(entity.DomainSensor).
+			Name(cfg.Name + " Next Run").
+			ID(cfg.UniqueID + "_next_run").
+			DeviceClass("timestamp").
+			DefaultStateTopic().Build()
+		entities = append(entities, nextRunEntity)
+	}
+
+	if cfg.Entities.LastRun != nil {
+		lastRunEntity = entity.NewEntity(*cfg.Entities.LastRun).
+			Type(entity.DomainSensor).
+			Name(cfg.Name + " Last Run").
+			ID(cfg.UniqueID + "_last_run").
+			DeviceClass("timestamp").
+			DefaultStateTopic().Build()
+		entities = append(entities, lastRunEntity)
 	}
 
 	cronEntity := entity.NewEntity(cfg.Config).
@@ -117,6 +141,28 @@ func NewCron(cfg CronConfig) []*entity.Entity {
 						return err
 					}
 					err = successEntity.PublishAttributes(client, map[string]string{})
+					if err != nil {
+						return err
+					}
+				}
+			}
+
+			// Update last run timestamp
+			if lastRunEntity != nil {
+				lastRun, err := entity.Job().LastRun()
+				if err == nil {
+					err = lastRunEntity.PublishState(client, lastRun.Format(time.RFC3339))
+					if err != nil {
+						return err
+					}
+				}
+			}
+
+			// Update next run timestamp
+			if nextRunEntity != nil {
+				nextRun, err := entity.Job().NextRun()
+				if err == nil {
+					err = nextRunEntity.PublishState(client, nextRun.Format(time.RFC3339))
 					if err != nil {
 						return err
 					}
