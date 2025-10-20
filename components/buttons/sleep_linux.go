@@ -1,4 +1,4 @@
-//go:build windows
+//go:build linux
 
 package buttons
 
@@ -10,15 +10,15 @@ import (
 	"os/exec"
 )
 
-func NewLock(cfg entity.Config) *entity.Entity {
+func NewSleep(cfg entity.Config) *entity.Entity {
 	return entity.NewEntity(cfg).
 		Type(entity.DomainButton).
-		ID("lock").
-		Icon("mdi:lock").
+		ID("sleep").
+		Icon("mdi:sleep").
 		OnCommand(func(entity *entity.Entity, client mqtt.Client, scheduler gocron.Scheduler, message mqtt.Message) {
-			err := exec.Command("rundll32.exe", "user32.dll,LockWorkStation").Run()
+			err := exec.Command("systemctl", "suspend").Run()
 			if err != nil {
-				log.Err(err).Msg("failed to run lock command")
+				log.Err(err).Msg("failed to run sleep command")
 			}
 		}).Build()
 }

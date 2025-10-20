@@ -1,4 +1,4 @@
-//go:build windows
+//go:build darwin
 
 package buttons
 
@@ -16,7 +16,7 @@ func NewLock(cfg entity.Config) *entity.Entity {
 		ID("lock").
 		Icon("mdi:lock").
 		OnCommand(func(entity *entity.Entity, client mqtt.Client, scheduler gocron.Scheduler, message mqtt.Message) {
-			err := exec.Command("rundll32.exe", "user32.dll,LockWorkStation").Run()
+			err := exec.Command("pmset", "displaysleepnow").Run()
 			if err != nil {
 				log.Err(err).Msg("failed to run lock command")
 			}
