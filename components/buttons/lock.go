@@ -1,14 +1,15 @@
 package buttons
 
 import (
-	"github.com/jcwillox/system-link/utils"
 	"os/exec"
 	"runtime"
+
+	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"github.com/go-co-op/gocron/v2"
+	"github.com/jcwillox/system-link/entity"
+	"github.com/jcwillox/system-link/utils"
+	"github.com/rs/zerolog/log"
 )
-import mqtt "github.com/eclipse/paho.mqtt.golang"
-import "github.com/go-co-op/gocron/v2"
-import "github.com/jcwillox/system-link/entity"
-import "github.com/rs/zerolog/log"
 
 func NewLock(cfg entity.Config) *entity.Entity {
 	return entity.NewEntity(cfg).

@@ -1,9 +1,10 @@
 package utils
 
 import (
-	"github.com/rs/zerolog/log"
 	"os"
 	"path/filepath"
+
+	"github.com/rs/zerolog/log"
 )
 
 var (
@@ -20,11 +21,4 @@ func init() {
 	ExePath = path
 	ExeDirectory = filepath.Dir(path)
 	ExeName = filepath.Base(path)
-}
-
-func IsSystemd() bool {
-	if _, err := os.Stat("/run/systemd/system"); !os.IsNotExist(err) {
-		return true
-	}
-	return false
 }
