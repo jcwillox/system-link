@@ -1,9 +1,10 @@
 package utils
 
 import (
-	"github.com/rs/zerolog/log"
 	"os"
 	"path/filepath"
+
+	"github.com/rs/zerolog/log"
 )
 
 var (
