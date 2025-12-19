@@ -1,0 +1,40 @@
+name: "Docs"
+
+on:
+  push:
+    branches:
+      - "main"
+    paths:
+      - docs/**
+      - mkdocs.yaml
+      - .github/workflows/docs.yaml
+  workflow_dispatch:
+
+env:
+  # renovate: datasource=pypi depName=mkdocs-material
+  MKDOCS_MATERIAL_VERSION: "9.7.1"
+
+jobs:
+  deploy_docs:
+    name: "Deploy Docs"
+    runs-on: ubuntu-latest
+    concurrency: deploy-docs-${{ github.ref }}
+    steps:
+      - name: "Checkout the repository"
+        uses: actions/checkout@v6
+
+      - name: "Install uv"
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+          cache-dependency-glob: "mkdocs.yaml"
+
+      - name: "Setup Python"
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.x"
+
+      - name: "Build & Deploy 🚀"
+        run: uvx --with "mkdocs-material==${{ env.MKDOCS_MATERIAL_VERSION }}" mkdocs gh-deploy --force
+        env:
+          SITE_DESCRIPTION: ${{ github.event.repository.description }}
