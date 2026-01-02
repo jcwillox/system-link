@@ -1,7 +1,8 @@
 FROM scratch
+ARG TARGETPLATFORM
 
 ENV SYSTEM_LINK_CONFIG=/config/config.yaml
 ENV SYSTEM_LINK_LOGS_DIR=/logs
 
-COPY system-link /
+COPY $TARGETPLATFORM/system-link /
 ENTRYPOINT ["/system-link"]

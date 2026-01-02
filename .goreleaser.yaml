@@ -47,7 +47,9 @@ nfpms:
       - deb
 
 dockers_v2:
-  - images:
+  - &docker_base
+    id: scratch
+    images:
       - ghcr.io/jcwillox/{{ .ProjectName }}
     tags:
       - "{{ .Version }}"
@@ -57,7 +59,7 @@ dockers_v2:
     platforms:
       - linux/amd64
       - linux/arm64
-    labels: &oci_labels
+    labels:
       org.opencontainers.image.title: "{{ .ProjectName }}"
       org.opencontainers.image.url: https://github.com/jcwillox/{{ .ProjectName }}
       org.opencontainers.image.source: https://github.com/jcwillox/{{ .ProjectName }}
@@ -68,21 +70,16 @@ dockers_v2:
       org.opencontainers.image.licenses: MIT
 
   - &python_base
+    <<: *docker_base
     id: python3-13
     dockerfile: Dockerfile-python
-    images:
-      - ghcr.io/jcwillox/{{ .ProjectName }}
     tags:
       - "{{ .Version }}-python3.13-alpine"
       - "{{ .Major }}-python3.13-alpine"
       - "{{ .Major }}.{{ .Minor }}-python3.13-alpine"
       - python3.13-alpine
-    platforms:
-      - linux/amd64
-      - linux/arm64
     build_args:
       PYTHON_VERSION: "3.13"
-    labels: *oci_labels
 
   - <<: *python_base
     id: python3-14
