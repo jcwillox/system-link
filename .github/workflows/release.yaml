@@ -27,7 +27,7 @@ on:
 
 env:
   # renovate: datasource=github-releases depName=goreleaser packageName=goreleaser/goreleaser
-  GORELEASER_VERSION: 2.11.2
+  GORELEASER_VERSION: 2.13.2
 
 jobs:
   publish:
