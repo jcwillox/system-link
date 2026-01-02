@@ -132,6 +132,8 @@ nav:
       - Filters: advanced/filters.md
       - Templates: advanced/templating.md
       - Scheduled Tasks: advanced/scheduled-tasks.md
+      - Secrets: advanced/secrets.md
+      - Splitting Configuration: advanced/splitting-configuration.md
 
 not_in_nav: |
   snippets/*

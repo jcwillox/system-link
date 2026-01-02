@@ -2,16 +2,17 @@ package config
 
 import (
 	"fmt"
-	"github.com/creasty/defaults"
-	"github.com/go-playground/validator/v10"
-	"github.com/goccy/go-yaml"
-	"github.com/jcwillox/system-link/utils"
-	"github.com/rs/zerolog/log"
 	"os"
 	"path"
 	"path/filepath"
 	"strings"
 	"sync"
+
+	"github.com/creasty/defaults"
+	"github.com/go-playground/validator/v10"
+	"github.com/goccy/go-yaml"
+	"github.com/jcwillox/system-link/utils"
+	"github.com/rs/zerolog/log"
 )
 
 var (
@@ -78,10 +79,16 @@ func LoadConfig() {
 
 	validate := validator.New()
 
+	rootNode, err := processTags(data)
+	if err != nil {
+		log.Fatal().Err(err).Msg("fatal error parsing config (tokenization)")
+	}
+
 	// parse config
-	if err = yaml.UnmarshalWithOptions(data, &Config, yaml.Validator(validate)); err != nil {
+	err = yaml.NodeToValue(rootNode, &Config, yaml.Validator(validate))
+	if err != nil {
 		fmt.Println(yaml.FormatError(err, true, true))
-		log.Fatal().Msg("fatal error parsing config")
+		log.Fatal().Msg("fatal error parsing \"config.yaml\"")
 	}
 
 	// load device config

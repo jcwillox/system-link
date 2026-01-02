@@ -12,3 +12,6 @@ tasks:
 
   build:all:
     cmd: goreleaser release --clean --snapshot
+
+  mkdocs:serve:
+    cmd: mkdocs serve
