@@ -1,4 +1,4 @@
-# System-Link
+# System Link
 
 [![GitHub Release](https://img.shields.io/github/v/release/jcwillox/system-link?style=flat-square)](https://github.com/jcwillox/system-link/releases/latest)
 [![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/jcwillox/system-link?style=flat-square&label=go)](https://github.com/jcwillox/system-link/blob/main/go.mod)
@@ -26,7 +26,7 @@ iwr -useb jcwillox.com/l/syslink-ps1 | iex
 You can pull the Docker image from GitHub Container Registry:
 
 ```sh
-docker pull ghcr.io/jcwillox/system-link:latest
+docker pull ghcr.io/jcwillox/system-link:python3-alpine
 ```
 
 Full Config

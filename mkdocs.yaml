@@ -1,0 +1,136 @@
+site_name: System Link
+site_description: !ENV SITE_DESCRIPTION
+site_author: Joshua Cowie-Willox
+site_url: https://jcwillox.github.io/system-link
+
+repo_name: jcwillox/system-link
+repo_url: https://github.com/jcwillox/system-link
+edit_uri: edit/main/docs/
+
+copyright: Copyright &copy; Joshua Cowie-Willox
+
+extra:
+  social:
+    - icon: material/coffee
+      link: https://ko-fi.com/jcwillox
+    - icon: fontawesome/brands/github
+      link: https://github.com/jcwillox
+
+theme:
+  name: material
+  icon:
+    logo: material/bridge
+  features:
+    - navigation.tabs
+    - navigation.instant
+    - navigation.expand
+    - navigation.top
+    - navigation.sections
+    - navigation.tracking
+    - navigation.indexes
+    - navigation.path
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+  palette:
+    - media: "(prefers-color-scheme)"
+      primary: blue
+      accent: cyan
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: blue
+      accent: cyan
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to dark mode
+
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: blue
+      accent: cyan
+      toggle:
+        icon: material/weather-night
+        name: Switch to system preference
+
+plugins:
+  - search
+  - tags
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.details
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+
+nav:
+  - Overview: index.md
+  - Getting Started: getting-started/index.md
+  - Components:
+      - Overview: components/index.md
+      - Sensors:
+        - Overview: components/sensors/index.md
+        - CPU: components/sensors/cpu.md
+        - Memory: components/sensors/memory.md
+        - Disk: components/sensors/disk.md
+        - Swap: components/sensors/swap.md
+        - ZFS Pool: components/sensors/zpool.md
+        - Uptime: components/sensors/uptime.md
+        - Battery: components/sensors/battery.md
+        - Custom: components/sensors/custom.md
+      - Binary Sensors:
+        - Overview: components/binary-sensors/index.md
+        - Status: components/binary-sensors/status.md
+      - Buttons:
+        - Overview: components/buttons/index.md
+        - Shutdown: components/buttons/shutdown.md
+        - Force Shutdown: components/buttons/force-shutdown.md
+        - Lock: components/buttons/lock.md
+        - Sleep: components/buttons/sleep.md
+        - Reload: components/buttons/reload.md
+        - Exit: components/buttons/exit.md
+        - Reset Topics: components/buttons/reset-topics.md
+        - Custom: components/buttons/custom.md
+      - Switches:
+        - Overview: components/switches/index.md
+        - Startup: components/switches/startup.md
+        - Cron: components/switches/cron.md
+      - Locks:
+        - Overview: components/locks/index.md
+        - Custom Lock: components/locks/custom.md
+      - Images:
+        - Overview: components/images/index.md
+        - Screen: components/images/screen.md
+      - Updaters:
+        - Overview: components/updaters/index.md
+        - Update: components/updaters/update.md
+  - Security:
+      - Overview: security/index.md
+      - Access Control: security/access-control.md
+      - Code Execution: security/code-execution.md
+      - Encryption: security/encryption.md
+  - Advanced:
+      - Overview: advanced/index.md
+      - Filters: advanced/filters.md
+      - Templates: advanced/templating.md
+      - Scheduled Tasks: advanced/scheduled-tasks.md
+
+not_in_nav: |
+  snippets/*
