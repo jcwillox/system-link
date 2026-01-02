@@ -13,7 +13,7 @@ require (
 	github.com/go-playground/validator/v10 v10.30.1
 	github.com/goccy/go-yaml v1.19.1
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510
-	github.com/kbinani/screenshot v0.0.0-20240820160931-a8a2c5d0e191
+	github.com/kbinani/screenshot v0.0.0-20250624051815-089614a94018
 	github.com/mattn/go-isatty v0.0.20
 	github.com/rs/zerolog v1.34.0
 	github.com/shirou/gopsutil/v4 v4.25.12
