@@ -20,6 +20,7 @@ theme:
   name: material
   icon:
     logo: material/bridge
+  favicon: assets/logo.png
   features:
     - navigation.tabs
     - navigation.instant
