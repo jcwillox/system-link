@@ -157,10 +157,10 @@ function get_goarch {
             return "arm64"
         }
         "X86" {
-            if ($os -eq "windows") { return "x86" } else { return "386" }
+          return "386"
         }
         "X64" {
-            if ($os -eq "windows") { return "x64" } else { return "amd64" }
+          return "amd64"
         }
 
         default {
