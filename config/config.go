@@ -33,6 +33,9 @@ var (
 		// fallback to exe directory
 		return configPath
 	})
+	Directory = sync.OnceValue(func() string {
+		return filepath.Dir(Path())
+	})
 )
 
 type CoreConfig struct {
@@ -79,6 +82,7 @@ func LoadConfig() {
 
 	validate := validator.New()
 
+	// handle yaml tags interpolation
 	rootNode, err := processTags(data)
 	if err != nil {
 		log.Fatal().Err(err).Msg("fatal error parsing config (tokenization)")

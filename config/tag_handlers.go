@@ -10,12 +10,11 @@ import (
 	"github.com/goccy/go-yaml"
 	"github.com/goccy/go-yaml/ast"
 	"github.com/goccy/go-yaml/parser"
-	"github.com/jcwillox/system-link/utils"
 	"github.com/rs/zerolog/log"
 )
 
 var loadSecrets = sync.OnceValue(func() map[string]string {
-	secretsPath := filepath.Join(utils.ExeDirectory, "secrets.yaml")
+	secretsPath := filepath.Join(Directory(), "secrets.yaml")
 	data, err := os.ReadFile(secretsPath)
 	if err != nil {
 		log.Fatal().Err(err).Str("path", Path()).Msg("fatal error reading \"secrets.yaml\"")
@@ -47,7 +46,7 @@ func (v *tagVisitor) Visit(node ast.Node) ast.Visitor {
 				if tagName == "!include" {
 					includeFilePath := stringNode.Value
 					if !path.IsAbs(includeFilePath) {
-						includeFilePath = filepath.Join(filepath.Dir(Path()), includeFilePath)
+						includeFilePath = filepath.Join(Directory(), includeFilePath)
 					}
 
 					parsedAst, err := parser.ParseFile(includeFilePath, parser.ParseComments)
