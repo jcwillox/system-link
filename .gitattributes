@@ -1,2 +1,7 @@
 # normalise line endings to lf on all platforms
 * text=auto eol=lf
+
+# linguist overrides
+completions/* linguist-generated
+scripts/install-system-link.sh linguist-vendored
+scripts/install-system-link.ps1 linguist-vendored
