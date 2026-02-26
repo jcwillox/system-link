@@ -17,6 +17,7 @@ type CronEntities struct {
 	Run        *entity.Config `yaml:"run,omitempty"`
 	NextRun    *entity.Config `yaml:"next_run,omitempty"`
 	LastRun    *entity.Config `yaml:"last_run,omitempty"`
+	Output     *entity.Config `yaml:"output,omitempty"`
 }
 
 type CronConfig struct {
@@ -37,6 +38,7 @@ func NewCron(cfg CronConfig) []*entity.Entity {
 		exitCodeEntity *entity.Entity
 		nextRunEntity  *entity.Entity
 		lastRunEntity  *entity.Entity
+		outputEntity   *entity.Entity
 		entities       []*entity.Entity
 	)
 
@@ -93,6 +95,17 @@ func NewCron(cfg CronConfig) []*entity.Entity {
 		entities = append(entities, lastRunEntity)
 	}
 
+	if cfg.Entities.Output != nil {
+		outputEntity = entity.NewEntity(*cfg.Entities.Output).
+			Type(entity.DomainSensor).
+			Name(cfg.Name + " Output").
+			ID(cfg.UniqueID + "_output").
+			Icon("mdi:console").
+			DefaultStateTopic().
+			DefaultAttributesTopic().Build()
+		entities = append(entities, outputEntity)
+	}
+
 	cronEntity := entity.NewEntity(cfg.Config).
 		Type(entity.DomainSwitch).
 		ObjectID(cfg.UniqueID).
@@ -116,6 +129,22 @@ func NewCron(cfg CronConfig) []*entity.Entity {
 				}
 			}
 
+			if outputEntity != nil {
+				err := outputEntity.PublishState(client, len(string(res.Combined)))
+				if err != nil {
+					return err
+				}
+				err = outputEntity.PublishAttributes(client, map[string]interface{}{
+					"stdout":   string(res.Stdout),
+					"stderr":   string(res.Stderr),
+					"combined": string(res.Combined),
+					"code":     res.Code,
+				})
+				if err != nil {
+					return err
+				}
+			}
+
 			if err != nil || res.Code > 0 {
 				if successEntity != nil {
 					err := successEntity.PublishState(client, "ON")
@@ -123,9 +152,10 @@ func NewCron(cfg CronConfig) []*entity.Entity {
 						return err
 					}
 					err = successEntity.PublishAttributes(client, map[string]interface{}{
-						"stdout": string(res.Stdout),
-						"stderr": string(res.Stderr),
-						"code":   res.Code,
+						"stdout":   string(res.Stdout),
+						"stderr":   string(res.Stderr),
+						"combined": string(res.Combined),
+						"code":     res.Code,
 					})
 					if err != nil {
 						return err

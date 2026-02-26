@@ -4,13 +4,15 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/google/shlex"
-	"github.com/rs/zerolog/log"
-	"golang.org/x/sys/execabs"
 	"html/template"
+	"io"
 	"os"
 	"os/exec"
 	"runtime"
+
+	"github.com/google/shlex"
+	"github.com/rs/zerolog/log"
+	"golang.org/x/sys/execabs"
 )
 
 type CommandConfig struct {
@@ -24,9 +26,10 @@ type CommandConfig struct {
 }
 
 type CommandResult struct {
-	Stdout []byte `json:"stdout"`
-	Stderr []byte `json:"stderr"`
-	Code   int    `json:"code"`
+	Stdout   []byte `json:"stdout"`
+	Stderr   []byte `json:"stderr"`
+	Combined []byte `json:"combined"`
+	Code     int    `json:"code"`
 }
 
 func GetDefaultShell() []string {
@@ -126,15 +129,17 @@ func RunCommand(cfg CommandConfig) (CommandResult, error) {
 
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
+	var combined bytes.Buffer
+	cmd.Stdout = io.MultiWriter(&stdout, &combined)
+	cmd.Stderr = io.MultiWriter(&stderr, &combined)
 
 	err = cmd.Run()
 
 	res := CommandResult{
-		Stdout: stdout.Bytes(),
-		Stderr: stderr.Bytes(),
-		Code:   0,
+		Stdout:   stdout.Bytes(),
+		Stderr:   stderr.Bytes(),
+		Combined: combined.Bytes(),
+		Code:     0,
 	}
 
 	var ee *exec.ExitError

@@ -36,6 +36,7 @@ switches:
         run: {}                  # Button to run immediately
         exit_code: {}            # Last exit code
         successful: {}           # Was last run successful
+        output: {}               # Captured stdout/stderr from last run
         next_run: {}             # Time of next scheduled run
         last_run: {}             # Time of last run
 ```
@@ -101,6 +102,7 @@ switches:
         duration: {}      # Sensor: execution duration in seconds
         run: {}           # Button: run task immediately
         exit_code: {}     # Sensor: last exit code
+        output: {}        # Sensor: captured output from last execution
         successful: {}    # Binary sensor: was last run successful
         next_run: {}      # Sensor: timestamp of next run
         last_run: {}      # Sensor: timestamp of last run
@@ -145,6 +147,18 @@ Timestamp of when the task last ran.
 
 **Device Class**: timestamp
 **Icon**: mdi:clock-check-outline
+
+### Output Sensor
+
+Captures the combined and individual stdout/stderr output from the last command execution. Useful for quick inspection of what the command printed without needing to fetch logs.
+
+**Type**: string
+**Icon**: mdi:terminal
+
+Notes:
+- Output may be truncated in the frontend if very large.
+- Use the `show_output` flag on the cron switch to enable logging of full output to logs in addition to this sensor.
+- The output is also shown on the `successful` entity but only when the task fails, to help with debugging.
 
 ## Use Cases
 
@@ -295,6 +309,8 @@ entities:
     name: Status
   - entity: sensor.nightly_backup_duration
     name: Duration
+  - entity: sensor.nightly_backup_output
+    name: Output
   - entity: button.nightly_backup_run
     name: Run Now
 ```
