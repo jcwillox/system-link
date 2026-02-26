@@ -64,7 +64,17 @@ var (
 		if PortableMode() {
 			return ExePath + ".lock"
 		}
-		return filepath.Join(ShareDirectory(), ExeBaseName+"."+ExePathHash+".lock")
+		lockName := ExeBaseName + "." + ExePathHash + ".lock"
+		// use env path if set for locks
+		if env := os.Getenv("SYSTEM_LINK_LOCKS_DIR"); env != "" {
+			return filepath.Join(env, lockName)
+		}
+		// use env path if set for logs
+		if env := os.Getenv("SYSTEM_LINK_LOGS_DIR"); env != "" {
+			return filepath.Join(env, lockName)
+		}
+		// otherwise use the share directory
+		return filepath.Join(ShareDirectory(), lockName)
 	})
 )
 
