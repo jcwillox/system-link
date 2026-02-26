@@ -10,3 +10,7 @@ indent_size = 2
 [{*.go,*.mod}]
 indent_style = tab
 indent_size = 4
+
+[scripts/install-system-link.ps1]
+indent_style = space
+indent_size = 4

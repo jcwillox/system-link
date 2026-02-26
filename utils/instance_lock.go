@@ -2,11 +2,11 @@ package utils
 
 import (
 	"errors"
+	"os"
+	"strconv"
+
 	"github.com/rs/zerolog/log"
 	"github.com/shirou/gopsutil/v4/process"
-	"os"
-	"path/filepath"
-	"strconv"
 )
 
 type InstanceLock struct {
@@ -14,7 +14,7 @@ type InstanceLock struct {
 }
 
 func NewInstanceLock() InstanceLock {
-	return InstanceLock{lockFile: filepath.Join(ExePath + ".lock")}
+	return InstanceLock{lockFile: LockPath()}
 }
 
 // Lock writes the current process id to the lock file

@@ -2,6 +2,8 @@ package engine
 
 import (
 	"fmt"
+	"os"
+
 	"github.com/goccy/go-yaml"
 	"github.com/jcwillox/system-link/components/binary_sensors"
 	"github.com/jcwillox/system-link/components/buttons"
@@ -10,10 +12,9 @@ import (
 	"github.com/jcwillox/system-link/components/sensors"
 	"github.com/jcwillox/system-link/components/switches"
 	"github.com/jcwillox/system-link/components/updaters"
-	"github.com/jcwillox/system-link/config"
 	"github.com/jcwillox/system-link/entity"
+	"github.com/jcwillox/system-link/utils"
 	"github.com/rs/zerolog/log"
-	"os"
 )
 
 type EntitiesConfig struct {
@@ -55,7 +56,7 @@ func (c *EntitiesConfig) LoadEntities() []*entity.Entity {
 }
 
 func LoadEntities() []*entity.Entity {
-	data, err := os.ReadFile(config.Path())
+	data, err := os.ReadFile(utils.ConfigPath())
 	if err != nil {
 		log.Fatal().Err(err).Msg("fatal error reading entities config")
 	}

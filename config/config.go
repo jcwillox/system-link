@@ -4,9 +4,6 @@ import (
 	"fmt"
 	"os"
 	"path"
-	"path/filepath"
-	"strings"
-	"sync"
 
 	"github.com/creasty/defaults"
 	"github.com/go-playground/validator/v10"
@@ -20,22 +17,6 @@ var (
 	Version         string
 	Config          CoreConfig
 	ShutdownChannel = make(chan bool)
-	Path            = sync.OnceValue(func() string {
-		// attempt to load from exe directory first
-		configPath := filepath.Join(utils.ExeDirectory, "config.yaml")
-		if _, err := os.Stat(configPath); err == nil {
-			return configPath
-		}
-		// try load from env path
-		if env := os.Getenv("SYSTEM_LINK_CONFIG"); env != "" {
-			return env
-		}
-		// fallback to exe directory
-		return configPath
-	})
-	Directory = sync.OnceValue(func() string {
-		return filepath.Dir(Path())
-	})
 )
 
 type CoreConfig struct {
@@ -59,14 +40,6 @@ func (c *CoreConfig) AvailabilityTopic() string {
 	return path.Join(Config.MQTT.BaseTopic, Config.HostID, "availability")
 }
 
-func LogsPath() string {
-	name := strings.TrimSuffix(utils.ExeName, ".exe") + ".log"
-	if env := os.Getenv("SYSTEM_LINK_LOGS_DIR"); env != "" {
-		return filepath.Join(env, name)
-	}
-	return filepath.Join(utils.ExeDirectory, name)
-}
-
 func LoadConfig() {
 	// set defaults
 	err := defaults.Set(&Config)
@@ -75,9 +48,9 @@ func LoadConfig() {
 	}
 
 	// load config
-	data, err := os.ReadFile(Path())
+	data, err := os.ReadFile(utils.ConfigPath())
 	if err != nil {
-		log.Fatal().Err(err).Str("path", Path()).Msg("fatal error reading config")
+		log.Fatal().Err(err).Str("path", utils.ConfigPath()).Msg("fatal error reading config")
 	}
 
 	validate := validator.New()

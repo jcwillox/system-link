@@ -2,15 +2,17 @@ package config
 
 import (
 	"fmt"
-	mqtt "github.com/eclipse/paho.mqtt.golang"
-	"github.com/mattn/go-isatty"
-	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
-	"gopkg.in/natefinch/lumberjack.v2"
 	"os"
 	"path/filepath"
 	"strings"
 	"time"
+
+	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"github.com/jcwillox/system-link/utils"
+	"github.com/mattn/go-isatty"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
+	"gopkg.in/natefinch/lumberjack.v2"
 )
 
 type MQTTLogger struct {
@@ -33,7 +35,7 @@ func SetupLogging() {
 		NoColor:    !colored,
 	}
 
-	path := LogsPath()
+	path := utils.LogsPath()
 	_ = os.MkdirAll(filepath.Dir(path), os.ModePerm)
 
 	fileWriter := zerolog.ConsoleWriter{

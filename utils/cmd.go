@@ -70,6 +70,13 @@ func renderTemplate(command string) (string, error) {
 		"ExePath":      ExePath,
 		"ExeDirectory": ExeDirectory,
 		"ExeName":      ExeName,
+		"Home":         UserHomeDir(),
+		"ShareDir":     ShareDirectory(),
+		"Portable":     PortableMode(),
+		"ConfigPath":   ConfigPath(),
+		"ConfigDir":    ConfigDirectory(),
+		"LogsPath":     LogsPath(),
+		"LockPath":     LockPath(),
 	})
 	if err != nil {
 		return "", fmt.Errorf("failed to render template command: %s; %w", command, err)

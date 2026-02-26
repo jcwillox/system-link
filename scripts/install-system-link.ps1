@@ -157,10 +157,10 @@ function get_goarch {
             return "arm64"
         }
         "X86" {
-          return "386"
+            return "386"
         }
         "X64" {
-          return "amd64"
+            return "amd64"
         }
 
         default {
