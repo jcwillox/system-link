@@ -112,6 +112,14 @@ func NewCron(cfg CronConfig) []*entity.Entity {
 		ScheduleJob(gocron.CronJob(cfg.Schedule, true), func(entity *entity.Entity, client mqtt.Client, scheduler gocron.Scheduler) error {
 			start := time.Now()
 
+			// update the last run timestamp
+			if lastRunEntity != nil {
+				err := lastRunEntity.PublishState(client, start.Format(time.RFC3339))
+				if err != nil {
+					return err
+				}
+			}
+
 			// run command
 			res, err := utils.RunCommand(cfg.CommandConfig)
 
@@ -178,20 +186,7 @@ func NewCron(cfg CronConfig) []*entity.Entity {
 				}
 			}
 
-			// Update last run timestamp
-			if lastRunEntity != nil {
-				if job := entity.Job(); job != nil {
-					lastRun, err := job.LastRun()
-					if err == nil {
-						err = lastRunEntity.PublishState(client, lastRun.Format(time.RFC3339))
-						if err != nil {
-							return err
-						}
-					}
-				}
-			}
-
-			// Update next run timestamp
+			// update the next run timestamp
 			if nextRunEntity != nil {
 				if job := entity.Job(); job != nil {
 					nextRun, err := job.NextRun()
