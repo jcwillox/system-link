@@ -1,31 +1,31 @@
 module github.com/jcwillox/system-link
 
-go 1.24.0
+go 1.25.0
 
-toolchain go1.24.11
+toolchain go1.26.4
 
 require (
 	github.com/PaesslerAG/jsonpath v0.1.1
 	github.com/creasty/defaults v1.8.0
 	github.com/distatus/battery v0.11.0
 	github.com/eclipse/paho.mqtt.golang v1.5.1
-	github.com/go-co-op/gocron/v2 v2.19.0
-	github.com/go-playground/validator/v10 v10.30.1
-	github.com/goccy/go-yaml v1.19.1
+	github.com/go-co-op/gocron/v2 v2.21.2
+	github.com/go-playground/validator/v10 v10.30.3
+	github.com/goccy/go-yaml v1.19.2
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510
 	github.com/kbinani/screenshot v0.0.0-20250624051815-089614a94018
-	github.com/mattn/go-isatty v0.0.20
-	github.com/rs/zerolog v1.34.0
-	github.com/shirou/gopsutil/v4 v4.25.12
-	golang.org/x/sys v0.39.0
-	golang.org/x/text v0.32.0
+	github.com/mattn/go-isatty v0.0.22
+	github.com/rs/zerolog v1.35.1
+	github.com/shirou/gopsutil/v4 v4.26.5
+	golang.org/x/sys v0.45.0
+	golang.org/x/text v0.37.0
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 )
 
 require (
 	github.com/PaesslerAG/gval v1.0.0 // indirect
-	github.com/ebitengine/purego v0.9.1 // indirect
-	github.com/gabriel-vasile/mimetype v1.4.12 // indirect
+	github.com/ebitengine/purego v0.10.0 // indirect
+	github.com/gabriel-vasile/mimetype v1.4.13 // indirect
 	github.com/gen2brain/shm v0.1.0 // indirect
 	github.com/go-ole/go-ole v1.3.0 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
@@ -44,8 +44,8 @@ require (
 	github.com/tklauser/go-sysconf v0.3.16 // indirect
 	github.com/tklauser/numcpus v0.11.0 // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
-	golang.org/x/crypto v0.46.0 // indirect
-	golang.org/x/net v0.47.0 // indirect
-	golang.org/x/sync v0.19.0 // indirect
+	golang.org/x/crypto v0.52.0 // indirect
+	golang.org/x/net v0.54.0 // indirect
+	golang.org/x/sync v0.20.0 // indirect
 	howett.net/plist v1.0.0 // indirect
 )
