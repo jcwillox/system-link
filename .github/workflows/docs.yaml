@@ -12,7 +12,7 @@ on:
 
 env:
   # renovate: datasource=pypi depName=mkdocs-material
-  MKDOCS_MATERIAL_VERSION: "9.7.6"
+  MKDOCS_MATERIAL_VERSION: "9.7.7"
 
 jobs:
   deploy_docs:
@@ -26,7 +26,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: "Install uv"
-        uses: astral-sh/setup-uv@v8.2.0
+        uses: astral-sh/setup-uv@v8.3.2
         with:
           enable-cache: true
           cache-dependency-glob: "mkdocs.yaml"
